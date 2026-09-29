@@ -184,8 +184,7 @@
   }
 
   input[type="text"],
-  input[type="email"],
-  textarea {
+  input[type="email"] {
     width: 100%;
     padding: 10px 14px;
     border: 1.5px solid var(--border);
@@ -198,9 +197,7 @@
     transition: border-color .15s, box-shadow .15s;
   }
 
-  textarea { resize: vertical; line-height: 1.5; }
-
-  input:focus, textarea:focus {
+  input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-bg);
   }
@@ -306,32 +303,6 @@
     background: var(--surface);
   }
 
-  /* ─── Event groups ────────────────────────────────────────────── */
-  .sec-hint {
-    font-size: 13px;
-    color: var(--fg-muted);
-    margin: -8px 0 16px;
-  }
-
-  .event-block + .event-block { margin-top: 20px; }
-
-  .event-title {
-    font-family: var(--font-d);
-    font-weight: 700;
-    font-size: 15px;
-    margin: 0 0 10px;
-  }
-
-  .cost-note {
-    font-size: 12.5px;
-    color: var(--fg-muted);
-    background: var(--surface-alt);
-    padding: 10px 12px;
-    border-radius: var(--r-sm);
-    margin: 14px 0 0;
-    line-height: 1.5;
-  }
-
   /* ─── Free note ───────────────────────────────────────────────── */
   .free-note {
     display: flex;
@@ -358,7 +329,7 @@
 
   .br-row {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     gap: 6px;
     align-items: baseline;
     font-size: 13px;
@@ -369,23 +340,18 @@
 
   .br-row:last-of-type { border-bottom: none; }
 
-  .br-name { font-weight: 500; }
+  .br-name { color: var(--fg-muted); }
 
   .br-calc {
     color: var(--fg-muted);
     font-size: 11.5px;
-    grid-column: 1;
+    text-align: right;
   }
 
   .br-sub {
-    font-family: var(--font-d);
-    font-weight: 700;
-    font-size: 20px;
+    font-weight: 600;
     text-align: right;
-    min-width: 40px;
-    grid-column: 2;
-    grid-row: 1 / 3;
-    align-self: center;
+    min-width: 52px;
   }
 
   .br-sub.zero { color: var(--fg-muted); font-weight: 400; }
@@ -582,108 +548,100 @@
             </div>
           </div>
 
-          <!-- Event Headcounts -->
+          <!-- Category Counts -->
           <div class="section">
-            <p class="sec-label">Estimated Attendance from Your Household</p>
-            <p class="sec-hint">Give your best estimate for each event, even if your plans aren't final yet.</p>
+            <p class="sec-label">Number of Attendees per Category</p>
 
-            <div class="event-block">
-              <p class="event-title">🎉 Gala Lunch/Dinner</p>
-              <div class="cat-row" id="galaAdultsrow">
-                <div class="cat-info">
-                  <span class="cat-title">Adults</span>
-                  <span class="cat-sub">Including yourself</span>
-                </div>
-                <div class="stepper">
-                  <button type="button" class="step-btn" onclick="step('galaAdults',-1)" aria-label="Fewer adults">−</button>
-                  <div class="step-val" id="galaAdultsval">0</div>
-                  <button type="button" class="step-btn" onclick="step('galaAdults',1)" aria-label="More adults">+</button>
-                </div>
+            <!-- Category 1 -->
+            <div class="cat-row" id="cat1row">
+              <div class="cat-info">
+                <span class="cat-title">Viqi Alumni</span>
+                <span class="cat-sub">Former students of Viqi</span>
               </div>
-              <div class="cat-row" id="galaChildrenrow">
-                <div class="cat-info">
-                  <span class="cat-title">Children</span>
-                  <span class="cat-sub">Children in your household</span>
-                </div>
-                <div class="stepper">
-                  <button type="button" class="step-btn" onclick="step('galaChildren',-1)" aria-label="Fewer children">−</button>
-                  <div class="step-val" id="galaChildrenval">0</div>
-                  <button type="button" class="step-btn" onclick="step('galaChildren',1)" aria-label="More children">+</button>
-                </div>
+              <span class="cat-price-tag">$150<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat1',-1)">−</button>
+                <div class="step-val" id="cat1val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat1',1)">+</button>
               </div>
             </div>
 
-            <div class="event-block">
-              <p class="event-title">📸 Meet, Greet &amp; Reminisce</p>
-              <div class="cat-row" id="meetAdultsrow">
-                <div class="cat-info">
-                  <span class="cat-title">Adults</span>
-                  <span class="cat-sub">Including yourself</span>
-                </div>
-                <div class="stepper">
-                  <button type="button" class="step-btn" onclick="step('meetAdults',-1)" aria-label="Fewer adults">−</button>
-                  <div class="step-val" id="meetAdultsval">0</div>
-                  <button type="button" class="step-btn" onclick="step('meetAdults',1)" aria-label="More adults">+</button>
-                </div>
+            <!-- Category 2 -->
+            <div class="cat-row" id="cat2row">
+              <div class="cat-info">
+                <span class="cat-title">Student / Guest (above 10 yrs)</span>
+                <span class="cat-sub">Students or any guest over 10 years old</span>
               </div>
-              <div class="cat-row" id="meetChildrenrow">
-                <div class="cat-info">
-                  <span class="cat-title">Children</span>
-                  <span class="cat-sub">Children in your household</span>
-                </div>
-                <div class="stepper">
-                  <button type="button" class="step-btn" onclick="step('meetChildren',-1)" aria-label="Fewer children">−</button>
-                  <div class="step-val" id="meetChildrenval">0</div>
-                  <button type="button" class="step-btn" onclick="step('meetChildren',1)" aria-label="More children">+</button>
-                </div>
+              <span class="cat-price-tag">$75<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat2',-1)">−</button>
+                <div class="step-val" id="cat2val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat2',1)">+</button>
               </div>
             </div>
-          </div>
 
-          <!-- Comments -->
-          <div class="section">
-            <p class="sec-label">Anything Else?</p>
-            <div class="fg">
-              <label class="fl" for="notes">Comments or questions (optional)</label>
-              <textarea id="notes" name="Comments" rows="3" placeholder="Activity ideas, dietary needs, questions for the committee…"></textarea>
+            <!-- Category 3 -->
+            <div class="cat-row" id="cat3row">
+              <div class="cat-info">
+                <span class="cat-title">Child (above 2 yrs, under 10 yrs)</span>
+                <span class="cat-sub">Children aged 2–10 years</span>
+              </div>
+              <span class="cat-price-tag">$50<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat3',-1)">−</button>
+                <div class="step-val" id="cat3val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat3',1)">+</button>
+              </div>
+            </div>
+
+            <div class="free-note">
+              🍼 Children under 2 years old attend <strong>free of charge</strong> — no registration needed.
             </div>
           </div>
 
         </div>
 
         <!-- Hidden fields submitted with form -->
-        <input type="hidden" id="hGalaAdults" name="Gala - Adults" value="0">
-        <input type="hidden" id="hGalaChildren" name="Gala - Children" value="0">
-        <input type="hidden" id="hMeetAdults" name="Meet and Greet - Adults" value="0">
-        <input type="hidden" id="hMeetChildren" name="Meet and Greet - Children" value="0">
+        <input type="hidden" id="hCat1" name="Viqi Alumni Count" value="0">
+        <input type="hidden" id="hCat2" name="Student/Guest Count" value="0">
+        <input type="hidden" id="hCat3" name="Child Count" value="0">
+        <input type="hidden" id="hTotal" name="Total Amount" value="$0">
       </form>
     </div>
 
-    <!-- Right: live headcount summary -->
+    <!-- Right: live breakdown -->
     <div>
       <div class="card summary-card">
-        <h3>Your RSVP</h3>
+        <h3>Cost Breakdown</h3>
 
         <div class="br-row">
-          <span class="br-name">Gala Lunch/Dinner</span>
-          <span class="br-calc" id="galaCalc">0 adults · 0 children</span>
-          <span class="br-sub zero" id="galaSub">0</span>
+          <span class="br-name">Viqi Alumni</span>
+          <span class="br-calc" id="b1calc">0 × $150</span>
+          <span class="br-sub zero" id="b1sub">$0</span>
         </div>
         <div class="br-row">
-          <span class="br-name">Meet, Greet &amp; Reminisce</span>
-          <span class="br-calc" id="meetCalc">0 adults · 0 children</span>
-          <span class="br-sub zero" id="meetSub">0</span>
+          <span class="br-name">Students/Guests</span>
+          <span class="br-calc" id="b2calc">0 × $75</span>
+          <span class="br-sub zero" id="b2sub">$0</span>
+        </div>
+        <div class="br-row">
+          <span class="br-name">Children</span>
+          <span class="br-calc" id="b3calc">0 × $50</span>
+          <span class="br-sub zero" id="b3sub">$0</span>
         </div>
 
-        <p class="cost-note">Costs per adult and per child will be confirmed later, once the headcount and venues are finalized.</p>
+        <div class="total-row">
+          <span class="total-lbl">Total Due</span>
+          <span class="total-amt zero" id="totalAmt">$0</span>
+        </div>
 
         <button type="submit" form="regForm" class="submit-btn" id="submitBtn">
-          Submit RSVP
+          Complete Registration
         </button>
         <div class="err-banner" id="errBanner">
           Something went wrong. Please try again or contact viqis.in.az@gmail.com
         </div>
-        <p class="form-note">Please RSVP by October 30, 2026.<br>Submissions go to viqis.in.az@gmail.com.</p>
+        <p class="form-note">Submissions go to viqis.in.az@gmail.com.<br>You'll get a confirmation after submitting.</p>
       </div>
     </div>
 
@@ -698,8 +656,8 @@
   <div id="successScreen" hidden>
     <div class="success-wrap">
       <div class="s-icon">✓</div>
-      <h2>RSVP Received!</h2>
-      <p>Thank you! We'll share the final costs and payment details once the venues and arrangements are confirmed.</p>
+      <h2>Registration Received!</h2>
+      <p>Thank you! Your registration has been submitted to the Viqi team.</p>
       <div class="receipt" id="receipt"></div>
     </div>
   </div>
@@ -708,8 +666,9 @@
 
 <script>
   // ── Counts state ─────────────────────────────────────────────────
-  const counts = { galaAdults: 0, galaChildren: 0, meetAdults: 0, meetChildren: 0 };
-  const MAX = 15;
+  const counts = { cat1: 0, cat2: 0, cat3: 0 };
+  const rates  = { cat1: 150, cat2: 75, cat3: 50 };
+  const MAX = 10;
 
   function step(id, delta) {
     counts[id] = Math.max(0, Math.min(MAX, counts[id] + delta));
@@ -719,36 +678,41 @@
     // Active styling
     document.getElementById(id + 'row').classList.toggle('active', counts[id] > 0);
 
-    updateSummary();
+    updateBreakdown();
   }
 
-  function adultsKids(a, c) {
-    return `${a} adult${a === 1 ? '' : 's'} · ${c} ${c === 1 ? 'child' : 'children'}`;
-  }
+  function fmt(n) { return '$' + n.toLocaleString(); }
 
-  function updateSummary() {
-    ['gala', 'meet'].forEach(ev => {
-      const adults = counts[ev + 'Adults'], children = counts[ev + 'Children'];
-      document.getElementById(ev + 'Calc').textContent = adultsKids(adults, children);
-      const subEl = document.getElementById(ev + 'Sub');
-      subEl.textContent = adults + children;
-      subEl.classList.toggle('zero', adults + children === 0);
+  function updateBreakdown() {
+    const ids = ['cat1','cat2','cat3'];
+    const labels = ['b1','b2','b3'];
+    const rateLabels = ['$150','$75','$50'];
+    let grand = 0;
+
+    ids.forEach((id, i) => {
+      const n = counts[id];
+      const sub = n * rates[id];
+      grand += sub;
+      const l = labels[i];
+      document.getElementById(l + 'calc').textContent = `${n} × ${rateLabels[i]}`;
+      const subEl = document.getElementById(l + 'sub');
+      subEl.textContent = fmt(sub);
+      subEl.classList.toggle('zero', sub === 0);
     });
-  }
 
-  function esc(v) {
-    const d = document.createElement('div');
-    d.textContent = v;
-    return d.innerHTML;
+    const totalEl = document.getElementById('totalAmt');
+    totalEl.textContent = fmt(grand);
+    totalEl.classList.toggle('zero', grand === 0);
+    document.getElementById('hTotal').value = fmt(grand);
   }
 
   // ── Submission ────────────────────────────────────────────────────
   document.getElementById('regForm').addEventListener('submit', async e => {
     e.preventDefault();
 
-    // Zero is a valid answer, but confirm it wasn't a mistake
-    const total = Object.values(counts).reduce((a, b) => a + b, 0);
-    if (total === 0 && !confirm("You haven't added anyone to either event. Submit an RSVP saying no one from your household will attend?")) {
+    // Require at least one person
+    if (counts.cat1 + counts.cat2 + counts.cat3 === 0) {
+      alert('Please add at least one attendee before submitting.');
       return;
     }
 
@@ -768,15 +732,22 @@
       if (!res.ok) throw new Error();
 
       // Build receipt
-      const val = id => esc(document.getElementById(id).value.trim());
+      const name     = document.getElementById('fullName').value;
+      const ssc      = document.getElementById('sscBatch').value;
+      const hsc      = document.getElementById('hscBatch').value;
+      const email    = document.getElementById('email').value;
+      const grand    = counts.cat1*150 + counts.cat2*75 + counts.cat3*50;
+
       let rows = `
-        <div class="rc-row"><span>Name</span><span>${val('fullName')}</span></div>
-        <div class="rc-row"><span>SSC Batch</span><span>${val('sscBatch')}</span></div>
-        <div class="rc-row"><span>HSC Batch</span><span>${val('hscBatch')}</span></div>
-        <div class="rc-row"><span>Email</span><span>${val('email')}</span></div>
-        <div class="rc-row"><span>Gala Lunch/Dinner</span><span>${adultsKids(counts.galaAdults, counts.galaChildren)}</span></div>
-        <div class="rc-row"><span>Meet, Greet &amp; Reminisce</span><span>${adultsKids(counts.meetAdults, counts.meetChildren)}</span></div>`;
-      if (val('notes')) rows += `<div class="rc-row"><span>Comments</span><span>${val('notes')}</span></div>`;
+        <div class="rc-row"><span>Name</span><span>${name}</span></div>
+        <div class="rc-row"><span>SSC Batch</span><span>${ssc}</span></div>
+        <div class="rc-row"><span>HSC Batch</span><span>${hsc}</span></div>
+        <div class="rc-row"><span>Email</span><span>${email}</span></div>`;
+
+      if (counts.cat1) rows += `<div class="rc-row"><span>Viqi Alumni (${counts.cat1})</span><span>${fmt(counts.cat1*150)}</span></div>`;
+      if (counts.cat2) rows += `<div class="rc-row"><span>Students/Guests (${counts.cat2})</span><span>${fmt(counts.cat2*75)}</span></div>`;
+      if (counts.cat3) rows += `<div class="rc-row"><span>Children (${counts.cat3})</span><span>${fmt(counts.cat3*50)}</span></div>`;
+      rows += `<div class="rc-row rc-total"><span>Total Due</span><span>${fmt(grand)}</span></div>`;
 
       document.getElementById('receipt').innerHTML = rows;
       document.getElementById('formLayout').hidden  = true;
@@ -787,7 +758,7 @@
     } catch {
       err.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Submit RSVP';
+      btn.textContent = 'Complete Registration';
     }
   });
 </script>
