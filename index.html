@@ -184,7 +184,8 @@
   }
 
   input[type="text"],
-  input[type="email"] {
+  input[type="email"],
+  input[type="tel"] {
     width: 100%;
     padding: 10px 14px;
     border: 1.5px solid var(--border);
@@ -600,6 +601,25 @@
             </div>
           </div>
 
+          <!-- Zelle Payment -->
+          <div class="section">
+            <p class="sec-label">Zelle Payment</p>
+            <!-- TODO: replace the placeholder with the real Zelle recipient number -->
+            <div class="free-note" style="margin:0 0 16px">
+              💵 Send your Total Due by Zelle to <strong>(000) 000-0000</strong>, then enter your details below.
+            </div>
+            <div class="row2">
+              <div class="fg" style="margin-bottom:0">
+                <label class="fl" for="zellePhone">Zelle Phone Number *</label>
+                <input type="tel" id="zellePhone" name="Zelle Phone Number" required autocomplete="tel" placeholder="e.g. (480) 555-0123">
+              </div>
+              <div class="fg" style="margin-bottom:0">
+                <label class="fl" for="zelleConf">Zelle Confirmation # *</label>
+                <input type="text" id="zelleConf" name="Zelle Confirmation Number" required placeholder="From your Zelle receipt">
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Hidden fields submitted with form -->
@@ -744,6 +764,8 @@
       const ssc      = esc(document.getElementById('sscBatch').value);
       const hsc      = esc(document.getElementById('hscBatch').value);
       const email    = esc(document.getElementById('email').value);
+      const zPhone   = esc(document.getElementById('zellePhone').value);
+      const zConf    = esc(document.getElementById('zelleConf').value);
       const grand    = counts.cat1*150 + counts.cat2*75 + counts.cat3*50;
 
       let rows = `
@@ -751,7 +773,9 @@
         <div class="rc-row"><span>Name</span><span>${name}</span></div>
         <div class="rc-row"><span>SSC Batch</span><span>${ssc}</span></div>
         <div class="rc-row"><span>HSC Batch</span><span>${hsc}</span></div>
-        <div class="rc-row"><span>Email</span><span>${email}</span></div>`;
+        <div class="rc-row"><span>Email</span><span>${email}</span></div>
+        <div class="rc-row"><span>Zelle Phone Number</span><span>${zPhone}</span></div>
+        <div class="rc-row"><span>Zelle Confirmation #</span><span>${zConf}</span></div>`;
 
       if (counts.cat1) rows += `<div class="rc-row"><span>Viqi Alumni (${counts.cat1})</span><span>${fmt(counts.cat1*150)}</span></div>`;
       if (counts.cat2) rows += `<div class="rc-row"><span>Students/Guests (${counts.cat2})</span><span>${fmt(counts.cat2*75)}</span></div>`;
