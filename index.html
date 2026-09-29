@@ -514,7 +514,7 @@
   <!-- Header -->
   <header class="page-header" id="pageHeader">
     <h1>VIQI 75 Years’ Celebration in AZ</h1>
-    <p>📅 January 30 &amp; 31, 2027 · RSVP by October 30, 2026</p>
+    <p>📅 January 30 &amp; 31, 2027 · Complete registration by October 30, 2026</p>
   </header>
 
   <!-- Form + Summary -->
@@ -522,7 +522,8 @@
 
     <!-- Left: form -->
     <div>
-      <form id="regForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <!-- action = Google Apps Script web app URL (see apps-script/SETUP.md) -->
+      <form id="regForm" action="PASTE_APPS_SCRIPT_WEB_APP_URL_HERE" method="POST">
         <div class="card">
 
           <!-- Personal Info -->
@@ -641,7 +642,7 @@
         <div class="err-banner" id="errBanner">
           Something went wrong. Please try again or contact viqis.in.az@gmail.com
         </div>
-        <p class="form-note">Submissions go to viqis.in.az@gmail.com.<br>You'll get a confirmation after submitting.</p>
+        <p class="form-note">A confirmation email will be sent to you and to viqis.in.az@gmail.com.</p>
       </div>
     </div>
 
@@ -657,7 +658,7 @@
     <div class="success-wrap">
       <div class="s-icon">✓</div>
       <h2>Registration Received!</h2>
-      <p>Thank you! Your registration has been submitted to the Viqi team.</p>
+      <p id="successMsg">Thank you! A confirmation email is on its way to you and to viqis.in.az@gmail.com.</p>
       <div class="receipt" id="receipt"></div>
     </div>
   </div>
@@ -679,6 +680,12 @@
     document.getElementById(id + 'row').classList.toggle('active', counts[id] > 0);
 
     updateBreakdown();
+  }
+
+  function esc(v) {
+    const d = document.createElement('div');
+    d.textContent = v;
+    return d.innerHTML;
   }
 
   function fmt(n) { return '$' + n.toLocaleString(); }
@@ -723,22 +730,24 @@
     btn.textContent = 'Submitting…';
 
     try {
+      // URL-encoded body keeps this a "simple" request, so Apps Script needs no CORS preflight
       const res = await fetch(e.target.action, {
         method: 'POST',
-        body: new FormData(e.target),
-        headers: { Accept: 'application/json' }
+        body: new URLSearchParams(new FormData(e.target))
       });
+      const data = await res.json();
 
-      if (!res.ok) throw new Error();
+      if (!data.ok) throw { userMessage: data.error };
 
       // Build receipt
-      const name     = document.getElementById('fullName').value;
-      const ssc      = document.getElementById('sscBatch').value;
-      const hsc      = document.getElementById('hscBatch').value;
-      const email    = document.getElementById('email').value;
+      const name     = esc(document.getElementById('fullName').value);
+      const ssc      = esc(document.getElementById('sscBatch').value);
+      const hsc      = esc(document.getElementById('hscBatch').value);
+      const email    = esc(document.getElementById('email').value);
       const grand    = counts.cat1*150 + counts.cat2*75 + counts.cat3*50;
 
       let rows = `
+        <div class="rc-row"><span>Registration ID</span><span>${esc(data.id)}</span></div>
         <div class="rc-row"><span>Name</span><span>${name}</span></div>
         <div class="rc-row"><span>SSC Batch</span><span>${ssc}</span></div>
         <div class="rc-row"><span>HSC Batch</span><span>${hsc}</span></div>
@@ -755,7 +764,15 @@
       document.getElementById('contactNote').hidden = true;
       document.getElementById('successScreen').hidden = false;
 
-    } catch {
+      const mailNote = data.emailSent === false
+        ? 'We couldn’t send the confirmation email right now, so please save this page. The committee has your registration.'
+        : 'A confirmation email is on its way to you and to viqis.in.az@gmail.com.';
+      document.getElementById('successMsg').textContent = (data.updated
+        ? 'You had already registered with this email, so your registration has been updated. '
+        : 'Thank you! ') + mailNote;
+
+    } catch (ex) {
+      err.textContent = (ex && ex.userMessage) || 'Something went wrong. Please try again or contact viqis.in.az@gmail.com';
       err.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'Complete Registration';
