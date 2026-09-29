@@ -133,33 +133,6 @@
     font-size: 14.5px;
   }
 
-  /* ─── Announcement ────────────────────────────────────────────── */
-  .announce {
-    max-width: 860px;
-    margin: 0 auto 20px;
-    font-size: 14.5px;
-  }
-
-  .announce p { margin: 0 0 12px; }
-  .announce p:last-child { margin-bottom: 0; }
-  .announce ul { margin: 0 0 12px; padding-left: 20px; }
-  .announce li { margin-bottom: 8px; }
-
-  .announce h2 {
-    font-family: var(--font-d);
-    font-size: 16px;
-    font-weight: 700;
-    margin: 20px 0 8px;
-  }
-
-  .announce-deadline {
-    background: var(--accent-bg);
-    padding: 10px 14px;
-    border-radius: var(--r-sm);
-  }
-
-  .announce-sign { margin-top: 18px !important; }
-
   /* ─── Layout ──────────────────────────────────────────────────── */
   .layout {
     display: grid;
@@ -574,29 +547,9 @@
 
   <!-- Header -->
   <header class="page-header" id="pageHeader">
-    <div class="badge"><span class="badge-dot"></span> Save the Date!</div>
     <h1>VIQI 75 Years’ Celebration in AZ</h1>
-    <p>📅 January 30 &amp; 31, 2027 · RSVP by September 17, 2026</p>
+    <p>📅 January 30 &amp; 31, 2027 · RSVP by October 30, 2026</p>
   </header>
-
-  <!-- Announcement -->
-  <section class="card announce" id="announce">
-    <p>Dear VIQI Friends and Families,</p>
-    <p>We are excited to begin planning our VIQI 75 Years’ Celebration and look forward to bringing everyone together for a memorable celebration!</p>
-    <p>We are planning activities across <strong>January 30 and 31, 2027</strong>, including:</p>
-    <ul>
-      <li><strong>Gala Lunch/Dinner</strong> – to be held on one of the two days. The date and venue will be finalized based on headcount and space availability.</li>
-      <li><strong>Meet, Greet &amp; Reminisce</strong> – to be held on the other day, giving us plenty of time to reconnect, catch up, share memories, and celebrate together! We are considering a picnic, excursion, or similar gathering, and, of course, lots and lots of photos!!</li>
-    </ul>
-    <p>We are still in the early planning stages, so some details, including the exact schedule, venues, activities, and cost, are still being worked out. Your responses will help us shape and finalize these plans.</p>
-    <p>To help us finalize the venue, food, seating, cultural programs, other arrangements, and the overall cost of the event, please complete the RSVP questions in this form for your entire household. At this stage, we especially need an estimate of how many people from each household would attend each of the two events.</p>
-    <h2>Cost Information</h2>
-    <p>There will be a cost associated with attending the event to help cover expenses such as the venue, food, activities, and other event arrangements. There will be a cost of participation per adult and per child. We will confirm those costs at a later date.</p>
-    <p>The final amount and payment details will be shared once we have a better idea of the total headcount and are able to confirm the venues and arrangements.</p>
-    <p class="announce-deadline">Please submit your RSVP by <strong>September 17, 2026</strong>. Even if your plans are not completely certain yet, please give us your best estimate so that we can move forward with planning.</p>
-    <p>We are very excited to celebrate 75 years of VIQI together and hope to see as many of you and your families as possible!</p>
-    <p class="announce-sign">Warmly,<br><strong>VIQI 75 Years’ Celebration in AZ Planning Committee</strong></p>
-  </section>
 
   <!-- Form + Summary -->
   <div class="layout" id="formLayout">
@@ -730,7 +683,7 @@
         <div class="err-banner" id="errBanner">
           Something went wrong. Please try again or contact viqis.in.az@gmail.com
         </div>
-        <p class="form-note">Please RSVP by September 17, 2026.<br>Submissions go to viqis.in.az@gmail.com.</p>
+        <p class="form-note">Please RSVP by October 30, 2026.<br>Submissions go to viqis.in.az@gmail.com.</p>
       </div>
     </div>
 
@@ -828,7 +781,6 @@
       document.getElementById('receipt').innerHTML = rows;
       document.getElementById('formLayout').hidden  = true;
       document.getElementById('pageHeader').hidden  = true;
-      document.getElementById('announce').hidden    = true;
       document.getElementById('contactNote').hidden = true;
       document.getElementById('successScreen').hidden = false;
 
