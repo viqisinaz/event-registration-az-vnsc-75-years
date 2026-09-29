@@ -1,0 +1,767 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Viqi Event Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap">
+
+<style>
+  /* ─── Tokens ─────────────────────────────────────────────────────
+     Layout: single form card left + sticky breakdown sidebar right
+  ──────────────────────────────────────────────────────────────── */
+  :root {
+    --bg:          #f3f3f0;
+    --surface:     #ffffff;
+    --surface-alt: #f0f0ec;
+    --border:      #e3e3de;
+    --fg:          #1a1a18;
+    --fg-muted:    #68685f;
+    --accent:      #1d4fa8;
+    --accent-bg:   #e8eefb;
+    --accent-fg:   #ffffff;
+    --success:     #166534;
+    --success-bg:  #dcfce7;
+    --error:       #991b1b;
+    --error-bg:    #fee2e2;
+    --free:        #854d0e;
+    --free-bg:     #fef9c3;
+    --shadow:      0 1px 3px rgba(0,0,0,0.07), 0 6px 18px rgba(0,0,0,0.07);
+    --r:           14px;
+    --r-sm:        9px;
+    --font-d:      'Figtree', system-ui, sans-serif;
+    --font-b:      'Inter', system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:          #111110;
+      --surface:     #1c1c1a;
+      --surface-alt: #262623;
+      --border:      #303030;
+      --fg:          #eeecea;
+      --fg-muted:    #96968e;
+      --accent:      #4d7de8;
+      --accent-bg:   #12234e;
+      --success:     #22c55e;
+      --success-bg:  #052e16;
+      --error:       #f87171;
+      --error-bg:    #450a0a;
+      --free:        #fbbf24;
+      --free-bg:     #1c1400;
+      --shadow:      0 1px 3px rgba(0,0,0,0.35), 0 6px 18px rgba(0,0,0,0.3);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:          #111110;
+    --surface:     #1c1c1a;
+    --surface-alt: #262623;
+    --border:      #303030;
+    --fg:          #eeecea;
+    --fg-muted:    #96968e;
+    --accent:      #4d7de8;
+    --accent-bg:   #12234e;
+    --success:     #22c55e;
+    --success-bg:  #052e16;
+    --error:       #f87171;
+    --error-bg:    #450a0a;
+    --free:        #fbbf24;
+    --free-bg:     #1c1400;
+    --shadow:      0 1px 3px rgba(0,0,0,0.35), 0 6px 18px rgba(0,0,0,0.3);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-b);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 40px 20px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Header ──────────────────────────────────────────────────── */
+  .page-header {
+    text-align: center;
+    max-width: 560px;
+    margin: 0 auto 40px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-family: var(--font-d);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+  }
+
+  .page-header h1 {
+    font-family: var(--font-d);
+    font-size: clamp(24px, 5vw, 38px);
+    font-weight: 800;
+    line-height: 1.12;
+    text-wrap: balance;
+    margin: 0 0 12px;
+    letter-spacing: -.02em;
+  }
+
+  .page-header p {
+    color: var(--fg-muted);
+    margin: 0;
+    font-size: 14.5px;
+  }
+
+  /* ─── Layout ──────────────────────────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 720px) {
+    .layout { grid-template-columns: 1fr 300px; align-items: start; }
+  }
+
+  /* ─── Card ────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    padding: 28px;
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--border);
+    padding-top: 26px;
+    margin-top: 26px;
+  }
+
+  .sec-label {
+    font-family: var(--font-d);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin: 0 0 16px;
+  }
+
+  /* ─── Inputs ──────────────────────────────────────────────────── */
+  .fg { margin-bottom: 16px; }
+  .fg:last-child { margin-bottom: 0; }
+
+  .fl {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--fg);
+  }
+
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--fg);
+    font-family: var(--font-b);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg);
+  }
+
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 440px) { .row2 { grid-template-columns: 1fr; } }
+
+  /* ─── Category counter rows ───────────────────────────────────── */
+  .cat-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--surface-alt);
+    margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+
+  .cat-row:last-child { margin-bottom: 0; }
+
+  .cat-row.active {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  .cat-info { flex: 1; min-width: 0; }
+
+  .cat-title {
+    font-family: var(--font-d);
+    font-weight: 700;
+    font-size: 14px;
+    display: block;
+    line-height: 1.3;
+  }
+
+  .cat-sub {
+    font-size: 11.5px;
+    color: var(--fg-muted);
+    display: block;
+    margin-top: 1px;
+  }
+
+  .cat-price-tag {
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ─── Stepper ─────────────────────────────────────────────────── */
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .step-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--fg);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .12s;
+    font-family: var(--font-d);
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+
+  .step-btn:hover { background: var(--surface-alt); }
+  .step-btn:active { background: var(--border); }
+
+  .step-val {
+    min-width: 32px;
+    text-align: center;
+    font-family: var(--font-d);
+    font-weight: 700;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    line-height: 34px;
+    user-select: none;
+    background: var(--surface);
+  }
+
+  /* ─── Free note ───────────────────────────────────────────────── */
+  .free-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--free-bg);
+    color: var(--free);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 9px 13px;
+    border-radius: var(--r-sm);
+    margin-top: 10px;
+  }
+
+  /* ─── Breakdown sidebar ───────────────────────────────────────── */
+  .summary-card { position: sticky; top: 24px; }
+
+  .summary-card h3 {
+    font-family: var(--font-d);
+    font-weight: 700;
+    font-size: 15px;
+    margin: 0 0 18px;
+  }
+
+  .br-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 6px;
+    align-items: baseline;
+    font-size: 13px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .br-row:last-of-type { border-bottom: none; }
+
+  .br-name { color: var(--fg-muted); }
+
+  .br-calc {
+    color: var(--fg-muted);
+    font-size: 11.5px;
+    text-align: right;
+  }
+
+  .br-sub {
+    font-weight: 600;
+    text-align: right;
+    min-width: 52px;
+  }
+
+  .br-sub.zero { color: var(--fg-muted); font-weight: 400; }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    margin-top: 8px;
+    border-top: 2px solid var(--border);
+  }
+
+  .total-lbl {
+    font-family: var(--font-d);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .total-amt {
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    transition: color .2s;
+  }
+
+  .total-amt.zero { color: var(--fg-muted); }
+
+  /* ─── Submit ──────────────────────────────────────────────────── */
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border: none;
+    border-radius: var(--r-sm);
+    font-family: var(--font-d);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .01em;
+    transition: opacity .15s, transform .1s;
+  }
+
+  .submit-btn:hover:not(:disabled) { opacity: .87; }
+  .submit-btn:active:not(:disabled) { transform: scale(.99); }
+  .submit-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .form-note {
+    font-size: 12px;
+    color: var(--fg-muted);
+    text-align: center;
+    margin: 10px 0 0;
+    line-height: 1.55;
+  }
+
+  .err-banner {
+    background: var(--error-bg);
+    color: var(--error);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: var(--r-sm);
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ─── Contact footer ──────────────────────────────────────────── */
+  .contact-note {
+    max-width: 860px;
+    margin: 20px auto 0;
+    font-size: 13px;
+    color: var(--fg-muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .contact-note a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* ─── Success ─────────────────────────────────────────────────── */
+  .success-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .s-icon {
+    width: 68px;
+    height: 68px;
+    background: var(--success-bg);
+    color: var(--success);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 24px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .success-wrap h2 {
+    font-family: var(--font-d);
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    letter-spacing: -.02em;
+  }
+
+  .success-wrap > p {
+    color: var(--fg-muted);
+    margin: 0 0 28px;
+  }
+
+  .receipt {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    padding: 22px 24px;
+    text-align: left;
+  }
+
+  .rc-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13.5px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rc-row:last-child { border-bottom: none; }
+  .rc-row span:first-child { color: var(--fg-muted); }
+
+  .rc-total {
+    font-family: var(--font-d);
+    font-weight: 700;
+    border-top: 2px solid var(--border);
+    margin-top: 6px;
+    padding-top: 14px;
+    border-bottom: none !important;
+  }
+
+  .rc-total span:last-child {
+    font-size: 20px;
+    color: var(--accent);
+  }
+</style>
+
+<div id="app">
+
+  <!-- Header -->
+  <header class="page-header" id="pageHeader">
+    <div class="badge"><span class="badge-dot"></span> Registration Open</div>
+    <h1>YOUR EVENT NAME HERE</h1>
+    <p>📅 Date · 📍 Venue · Powered by Viqi Alumni Network</p>
+  </header>
+
+  <!-- Form + Summary -->
+  <div class="layout" id="formLayout">
+
+    <!-- Left: form -->
+    <div>
+      <form id="regForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="card">
+
+          <!-- Personal Info -->
+          <div class="section">
+            <p class="sec-label">Your Information</p>
+            <div class="fg">
+              <label class="fl" for="fullName">Full Name *</label>
+              <input type="text" id="fullName" name="Full Name" required placeholder="Your full name">
+            </div>
+            <div class="row2">
+              <div class="fg">
+                <label class="fl" for="sscBatch">SSC Batch *</label>
+                <input type="text" id="sscBatch" name="SSC Batch" required placeholder="e.g. 2010">
+              </div>
+              <div class="fg">
+                <label class="fl" for="hscBatch">HSC Batch *</label>
+                <input type="text" id="hscBatch" name="HSC Batch" required placeholder="e.g. 2012">
+              </div>
+            </div>
+            <div class="fg" style="margin-bottom:0">
+              <label class="fl" for="email">Email Address *</label>
+              <input type="email" id="email" name="Email" required placeholder="your@email.com">
+            </div>
+          </div>
+
+          <!-- Category Counts -->
+          <div class="section">
+            <p class="sec-label">Number of Attendees per Category</p>
+
+            <!-- Category 1 -->
+            <div class="cat-row" id="cat1row">
+              <div class="cat-info">
+                <span class="cat-title">Viqi Alumni</span>
+                <span class="cat-sub">Former students of Viqi</span>
+              </div>
+              <span class="cat-price-tag">$150<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat1',-1)">−</button>
+                <div class="step-val" id="cat1val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat1',1)">+</button>
+              </div>
+            </div>
+
+            <!-- Category 2 -->
+            <div class="cat-row" id="cat2row">
+              <div class="cat-info">
+                <span class="cat-title">Student / Guest (above 10 yrs)</span>
+                <span class="cat-sub">Students or any guest over 10 years old</span>
+              </div>
+              <span class="cat-price-tag">$75<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat2',-1)">−</button>
+                <div class="step-val" id="cat2val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat2',1)">+</button>
+              </div>
+            </div>
+
+            <!-- Category 3 -->
+            <div class="cat-row" id="cat3row">
+              <div class="cat-info">
+                <span class="cat-title">Child (above 2 yrs, under 10 yrs)</span>
+                <span class="cat-sub">Children aged 2–10 years</span>
+              </div>
+              <span class="cat-price-tag">$50<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat3',-1)">−</button>
+                <div class="step-val" id="cat3val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat3',1)">+</button>
+              </div>
+            </div>
+
+            <div class="free-note">
+              🍼 Children under 2 years old attend <strong>free of charge</strong> — no registration needed.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Hidden fields submitted with form -->
+        <input type="hidden" id="hCat1" name="Viqi Alumni Count" value="0">
+        <input type="hidden" id="hCat2" name="Student/Guest Count" value="0">
+        <input type="hidden" id="hCat3" name="Child Count" value="0">
+        <input type="hidden" id="hTotal" name="Total Amount" value="$0">
+      </form>
+    </div>
+
+    <!-- Right: live breakdown -->
+    <div>
+      <div class="card summary-card">
+        <h3>Cost Breakdown</h3>
+
+        <div class="br-row">
+          <span class="br-name">Viqi Alumni</span>
+          <span class="br-calc" id="b1calc">0 × $150</span>
+          <span class="br-sub zero" id="b1sub">$0</span>
+        </div>
+        <div class="br-row">
+          <span class="br-name">Students/Guests</span>
+          <span class="br-calc" id="b2calc">0 × $75</span>
+          <span class="br-sub zero" id="b2sub">$0</span>
+        </div>
+        <div class="br-row">
+          <span class="br-name">Children</span>
+          <span class="br-calc" id="b3calc">0 × $50</span>
+          <span class="br-sub zero" id="b3sub">$0</span>
+        </div>
+
+        <div class="total-row">
+          <span class="total-lbl">Total Due</span>
+          <span class="total-amt zero" id="totalAmt">$0</span>
+        </div>
+
+        <button type="submit" form="regForm" class="submit-btn" id="submitBtn">
+          Complete Registration
+        </button>
+        <div class="err-banner" id="errBanner">
+          Something went wrong. Please try again or contact viqis.in.az@gmail.com
+        </div>
+        <p class="form-note">Submissions go to viqis.in.az@gmail.com.<br>You'll get a confirmation after submitting.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Contact note -->
+  <p class="contact-note" id="contactNote">
+    Having trouble with this form? Email us at <a href="mailto:viqis.in.az@gmail.com">viqis.in.az@gmail.com</a>
+  </p>
+
+  <!-- Success -->
+  <div id="successScreen" hidden>
+    <div class="success-wrap">
+      <div class="s-icon">✓</div>
+      <h2>Registration Received!</h2>
+      <p>Thank you! Your registration has been submitted to the Viqi team.</p>
+      <div class="receipt" id="receipt"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Counts state ─────────────────────────────────────────────────
+  const counts = { cat1: 0, cat2: 0, cat3: 0 };
+  const rates  = { cat1: 150, cat2: 75, cat3: 50 };
+  const MAX = 10;
+
+  function step(id, delta) {
+    counts[id] = Math.max(0, Math.min(MAX, counts[id] + delta));
+    document.getElementById(id + 'val').textContent = counts[id];
+    document.getElementById('h' + id.charAt(0).toUpperCase() + id.slice(1)).value = counts[id];
+
+    // Active styling
+    document.getElementById(id + 'row').classList.toggle('active', counts[id] > 0);
+
+    updateBreakdown();
+  }
+
+  function fmt(n) { return '$' + n.toLocaleString(); }
+
+  function updateBreakdown() {
+    const ids = ['cat1','cat2','cat3'];
+    const labels = ['b1','b2','b3'];
+    const rateLabels = ['$150','$75','$50'];
+    let grand = 0;
+
+    ids.forEach((id, i) => {
+      const n = counts[id];
+      const sub = n * rates[id];
+      grand += sub;
+      const l = labels[i];
+      document.getElementById(l + 'calc').textContent = `${n} × ${rateLabels[i]}`;
+      const subEl = document.getElementById(l + 'sub');
+      subEl.textContent = fmt(sub);
+      subEl.classList.toggle('zero', sub === 0);
+    });
+
+    const totalEl = document.getElementById('totalAmt');
+    totalEl.textContent = fmt(grand);
+    totalEl.classList.toggle('zero', grand === 0);
+    document.getElementById('hTotal').value = fmt(grand);
+  }
+
+  // ── Submission ────────────────────────────────────────────────────
+  document.getElementById('regForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    // Require at least one person
+    if (counts.cat1 + counts.cat2 + counts.cat3 === 0) {
+      alert('Please add at least one attendee before submitting.');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    const err = document.getElementById('errBanner');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(e.target.action, {
+        method: 'POST',
+        body: new FormData(e.target),
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!res.ok) throw new Error();
+
+      // Build receipt
+      const name     = document.getElementById('fullName').value;
+      const ssc      = document.getElementById('sscBatch').value;
+      const hsc      = document.getElementById('hscBatch').value;
+      const email    = document.getElementById('email').value;
+      const grand    = counts.cat1*150 + counts.cat2*75 + counts.cat3*50;
+
+      let rows = `
+        <div class="rc-row"><span>Name</span><span>${name}</span></div>
+        <div class="rc-row"><span>SSC Batch</span><span>${ssc}</span></div>
+        <div class="rc-row"><span>HSC Batch</span><span>${hsc}</span></div>
+        <div class="rc-row"><span>Email</span><span>${email}</span></div>`;
+
+      if (counts.cat1) rows += `<div class="rc-row"><span>Viqi Alumni (${counts.cat1})</span><span>${fmt(counts.cat1*150)}</span></div>`;
+      if (counts.cat2) rows += `<div class="rc-row"><span>Students/Guests (${counts.cat2})</span><span>${fmt(counts.cat2*75)}</span></div>`;
+      if (counts.cat3) rows += `<div class="rc-row"><span>Children (${counts.cat3})</span><span>${fmt(counts.cat3*50)}</span></div>`;
+      rows += `<div class="rc-row rc-total"><span>Total Due</span><span>${fmt(grand)}</span></div>`;
+
+      document.getElementById('receipt').innerHTML = rows;
+      document.getElementById('formLayout').hidden  = true;
+      document.getElementById('pageHeader').hidden  = true;
+      document.getElementById('contactNote').hidden = true;
+      document.getElementById('successScreen').hidden = false;
+
+    } catch {
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Complete Registration';
+    }
+  });
+</script>
+
+</body></html>
