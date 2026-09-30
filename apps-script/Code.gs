@@ -27,7 +27,7 @@ const HEADERS = [
   ...CATEGORIES.map(c => c.label),
   'Total Due ($)',
   // Added later, so they sit at the end to keep earlier rows aligned
-  'Zelle Phone Number', 'Zelle Confirmation #',
+  'Zelle Phone Number',
 ];
 
 function doPost(e) {
@@ -39,9 +39,8 @@ function doPost(e) {
     const hsc   = clean(p['HSC Batch']);
     const email = clean(p['Email']).toLowerCase();
     const zellePhone = clean(p['Zelle Phone Number']);
-    const zelleConf  = clean(p['Zelle Confirmation Number']);
 
-    if (!name || !ssc || !hsc || !zellePhone || !zelleConf) return reply({ ok: false, error: 'Please fill in all required fields.' });
+    if (!name || !ssc || !hsc || !zellePhone) return reply({ ok: false, error: 'Please fill in all required fields.' });
     if (!/^[^\s@<>,;"]+@[^\s@<>,;"]+\.[^\s@<>,;"]+$/.test(email)) {
       return reply({ ok: false, error: 'Please enter a valid email address.' });
     }
@@ -62,7 +61,7 @@ function doPost(e) {
     let updated = false;
     try {
       const sheet = getSheet();
-      const rowValues = [id, now, now, name, ssc, hsc, email, ...counts, total, zellePhone, zelleConf].map(safeCell);
+      const rowValues = [id, now, now, name, ssc, hsc, email, ...counts, total, zellePhone].map(safeCell);
 
       const ids = sheet.getLastRow() > 1
         ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().map(r => r[0])
@@ -84,7 +83,7 @@ function doPost(e) {
     // The row is already saved, so an email failure (e.g. daily quota) shouldn't fail the registration.
     let emailSent = true;
     try {
-      sendConfirmation({ id, name, ssc, hsc, email, zellePhone, zelleConf, counts, total, updated });
+      sendConfirmation({ id, name, ssc, hsc, email, zellePhone, counts, total, updated });
     } catch (mailErr) {
       console.error('Confirmation email failed for ' + id + ': ' + mailErr);
       emailSent = false;
@@ -116,12 +115,11 @@ function sendConfirmation(r) {
         <tr><td>HSC Batch</td><td align="right">${esc(r.hsc)}</td></tr>
         <tr><td>Email</td><td align="right">${esc(r.email)}</td></tr>
         <tr><td>Zelle Phone Number</td><td align="right">${esc(r.zellePhone)}</td></tr>
-        <tr><td>Zelle Confirmation #</td><td align="right">${esc(r.zelleConf)}</td></tr>
         ${lines}
         <tr style="border-top:2px solid #e3e3de"><td><strong>Total Due</strong></td><td align="right"><strong>$${r.total.toLocaleString()}</strong></td></tr>
       </table>
       <p>Children under 2 attend free of charge.</p>
-      <p>The committee will match your Zelle payment using the details above. If anything is wrong, simply submit the form again with the same email address and it will replace this registration, or reply to this email.</p>
+      <p>The committee will match your Zelle payment using the phone number above. If anything is wrong, simply submit the form again with the same email address and it will replace this registration, or reply to this email.</p>
       <p>Warmly,<br>VIQI 75 Years’ Celebration in AZ Planning Committee</p>
     </div>`;
 
