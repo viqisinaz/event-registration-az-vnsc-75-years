@@ -287,6 +287,46 @@
 
   .fee-who { display: block; font-size: 13px; line-height: 1.4; }
 
+  .memo-note {
+    background: var(--accent-bg);
+    border: 2px solid var(--accent);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 12px 0;
+  }
+
+  .memo-title {
+    display: block;
+    font-family: var(--font-d);
+    font-weight: 800;
+    font-size: 14.5px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .memo-example {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  .memo-example b { color: var(--fg); }
+
+  .next-step p strong { display: inline; font-size: inherit; margin: 0; }
+  #memoText { font-weight: 700; }
+
+  .next-step .memo-line {
+    background: var(--accent-bg);
+    border: 2px solid var(--accent);
+    border-radius: var(--r-sm);
+    padding: 8px 12px;
+    margin: 8px 0;
+    color: var(--fg);
+  }
+
   .give-note {
     background: var(--gold-bg);
     color: var(--fg);
@@ -918,6 +958,11 @@
               <div><span class="zc-lbl">Zelle Recipient</span><span class="zc-val">Sabira Enayet</span></div>
               <div><span class="zc-lbl">Zelle Phone Number</span><a class="zc-val" href="tel:+14805439295">(480) 543-9295</a></div>
             </div>
+            <div class="memo-note">
+              <span class="memo-title">📝 Important: add a message in Zelle</span>
+              Please make sure to add your <strong>name, SSC batch and HSC batch</strong> in the optional message field while sending the money through Zelle. This will help identify and confirm your registration. Thank you!
+              <span class="memo-example">Example message: <b>Jane Doe, SSC 2010, HSC 2012</b></span>
+            </div>
             <p>Your Zelle payment will serve as the official confirmation of your registration and attendance.</p>
           </div>
         </li>
@@ -1089,6 +1134,11 @@
               💵 Send your Total Due by Zelle to <strong>Sabira Enayet · (480) 543-9295</strong>.<br>
               <strong>Please save your Zelle confirmation number.</strong> Your Zelle payment serves as the confirmation of your registration and attendance. We’ll send you a confirmation email once we have received and confirmed your payment.
             </div>
+            <div class="memo-note">
+              <span class="memo-title">📝 Important: add a message in Zelle</span>
+              Please make sure to add your <strong>name, SSC batch and HSC batch</strong> in the optional message field while sending the money through Zelle. This will help identify and confirm your registration. Thank you!
+              <span class="memo-example">Example message: <b>Jane Doe, SSC 2010, HSC 2012</b></span>
+            </div>
             <div class="fg" style="margin-bottom:0">
               <label class="fl" for="zelleName">Name associated with the Zelle account to be used for payment *</label>
               <input type="text" id="zelleName" name="Zelle Account Name" required placeholder="Name as it appears on Zelle">
@@ -1171,6 +1221,7 @@
       <div class="next-step">
         <strong>Next step: send <span id="dueAmt"></span> via Zelle to confirm</strong>
         <p>Zelle Recipient: <b>Sabira Enayet</b> · Phone: <a href="tel:+14805439295">(480) 543-9295</a></p>
+        <p class="memo-line">📝 <strong>In the Zelle message field, please write:</strong> <span id="memoText"></span></p>
         <p>Your Zelle payment is the official confirmation of your registration and attendance. <strong>Please save your Zelle confirmation number.</strong> We’ll send you a confirmation email once we have received and confirmed your Zelle payment.</p>
       </div>
       <div class="receipt" id="receipt"></div>
@@ -1310,6 +1361,11 @@
       document.getElementById('successScreen').hidden = false;
 
       document.getElementById('dueAmt').textContent = fmt(grand);
+      document.getElementById('memoText').textContent = [
+        document.getElementById('fullName').value.trim(),
+        'SSC ' + document.getElementById('sscBatch').value.trim(),
+        'HSC ' + document.getElementById('hscBatch').value.trim(),
+      ].join(', ');
       const mailNote = data.emailSent === false
         ? 'We couldn’t send the email right now, so please save this page. The committee has your registration.'
         : 'A “registration in progress” email is on its way to you and to viqis.in.az@gmail.com.';

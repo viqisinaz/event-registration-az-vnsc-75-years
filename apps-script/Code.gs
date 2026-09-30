@@ -192,6 +192,11 @@ function sendConfirmation(r) {
       <h3 style="margin:20px 0 6px">Next step: complete your Zelle payment</h3>
       <p>Please send your Total Due of <strong>$${r.total.toLocaleString()}</strong> via Zelle to:</p>
       <p style="margin-left:14px">Zelle Recipient: <strong>${esc(ZELLE_RECIPIENT)}</strong><br>Zelle Phone Number: <strong>${esc(ZELLE_PHONE)}</strong></p>
+      <div style="background:#e8eefb;border:2px solid #1d4fa8;border-radius:8px;padding:12px 16px;margin:12px 0">
+        <p style="margin:0 0 6px;color:#1d4fa8;font-weight:bold">📝 Important: add a message in Zelle</p>
+        <p style="margin:0 0 8px">Please make sure to add your <strong>name, SSC batch and HSC batch</strong> in the optional message field while sending the money through Zelle. This will help identify and confirm your registration. Thank you!</p>
+        <p style="margin:0">Your message: <strong>${esc(r.name)}, SSC ${esc(r.ssc)}, HSC ${esc(r.hsc)}</strong></p>
+      </div>
       <p><strong>Your Zelle payment is the official confirmation of your registration and attendance.</strong> Please save your Zelle confirmation number, as it will serve as your registration record.</p>
       <p><strong>We will send you a confirmation email once we have received and confirmed your Zelle payment.</strong> Until then, your registration remains in progress.</p>
       <p>If anything above is wrong, simply submit the form again with the same full name, SSC batch, HSC batch and phone number and it will replace this registration, or reply to this email.</p>
