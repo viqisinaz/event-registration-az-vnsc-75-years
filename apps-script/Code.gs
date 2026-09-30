@@ -9,6 +9,8 @@
  */
 
 const ORGANIZER_EMAIL = 'viqis.in.az@gmail.com';
+const ZELLE_RECIPIENT = 'Sabira Enayet';
+const ZELLE_PHONE = '(480) 543-9295';
 const EVENT_NAME = 'VIQI 75 Years’ Celebration in AZ';
 const SHEET_NAME = 'Registrations';
 
@@ -20,6 +22,7 @@ const CATEGORIES = [
   { field: 'Child Count',         label: 'Child (above 2 yrs, under 10 yrs)',   price: 50 },
 ];
 const MAX_PER_CATEGORY = 10;
+const MAX_CONTRIBUTION = 100000;
 
 const HEADERS = [
   'Registration ID', 'Submitted At', 'Last Updated At',
@@ -27,8 +30,19 @@ const HEADERS = [
   ...CATEGORIES.map(c => c.label),
   'Total Due ($)',
   // Added later, so they sit at the end to keep earlier rows aligned
-  'Zelle Phone Number',
+  'Zelle Phone Number (no longer collected)',   // retired columns keep their place
+  'Zelle Confirmation # (no longer collected)', // so older rows stay aligned
+  'Additional Contribution ($)',
+  'Children under 2 (free)',
+  'Phone Number',
+  'Meet & Greet Headcount (Jan 30)',
+  'Gala Lunch Headcount (Jan 31)',
+  'Zelle Account Name',
 ];
+const RETIRED_COLS = HEADERS
+  .map((h, i) => (h.indexOf('(no longer collected)') !== -1 ? i : -1))
+  .filter(i => i !== -1);
+const MAX_EVENT_HEADCOUNT = 40;
 
 function doPost(e) {
   try {
@@ -38,9 +52,10 @@ function doPost(e) {
     const ssc   = clean(p['SSC Batch']);
     const hsc   = clean(p['HSC Batch']);
     const email = clean(p['Email']).toLowerCase();
-    const zellePhone = clean(p['Zelle Phone Number']);
+    const phone = clean(p['Phone Number']);
+    const zelleName = clean(p['Zelle Account Name']);
 
-    if (!name || !ssc || !hsc || !zellePhone) return reply({ ok: false, error: 'Please fill in all required fields.' });
+    if (!name || !ssc || !hsc || !phone || !zelleName) return reply({ ok: false, error: 'Please fill in all required fields.' });
     if (!/^[^\s@<>,;"]+@[^\s@<>,;"]+\.[^\s@<>,;"]+$/.test(email)) {
       return reply({ ok: false, error: 'Please enter a valid email address.' });
     }
@@ -51,7 +66,22 @@ function doPost(e) {
     });
     if (counts.every(n => n === 0)) return reply({ ok: false, error: 'Please add at least one attendee.' });
 
-    const total = counts.reduce((sum, n, i) => sum + n * CATEGORIES[i].price, 0);
+    const headcount = field => {
+      const n = parseInt(p[field], 10);
+      return Number.isFinite(n) ? Math.max(0, Math.min(MAX_EVENT_HEADCOUNT, n)) : 0;
+    };
+    const meet = headcount('Meet and Greet Headcount');
+    const gala = headcount('Gala Lunch Headcount');
+    if (meet + gala === 0) {
+      return reply({ ok: false, error: 'Please tell us how many people will join at least one of the two events.' });
+    }
+
+    const extra = Math.round(parseFloat(p['Additional Contribution']));
+    const contribution = Number.isFinite(extra) ? Math.max(0, Math.min(MAX_CONTRIBUTION, extra)) : 0;
+    const infantsRaw = parseInt(p['Children Under 2 Count'], 10);
+    const infants = Number.isFinite(infantsRaw) ? Math.max(0, Math.min(MAX_PER_CATEGORY, infantsRaw)) : 0;
+    const fees = counts.reduce((sum, n, i) => sum + n * CATEGORIES[i].price, 0);
+    const total = fees + contribution;
     const id = 'vnsc_75_az_' + email;
     const now = new Date();
 
@@ -61,7 +91,7 @@ function doPost(e) {
     let updated = false;
     try {
       const sheet = getSheet();
-      const rowValues = [id, now, now, name, ssc, hsc, email, ...counts, total, zellePhone].map(safeCell);
+      const rowValues = [id, now, now, name, ssc, hsc, email, ...counts, total, '', '', contribution, infants, phone, meet, gala, zelleName].map(safeCell);
 
       const ids = sheet.getLastRow() > 1
         ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().map(r => r[0])
@@ -73,6 +103,7 @@ function doPost(e) {
       } else {
         const row = existing + 2;
         rowValues[1] = sheet.getRange(row, 2).getValue(); // keep original submission time
+        RETIRED_COLS.forEach(i => { rowValues[i] = sheet.getRange(row, i + 1).getValue(); }); // keep older answers
         sheet.getRange(row, 1, 1, rowValues.length).setValues([rowValues]);
         updated = true;
       }
@@ -83,7 +114,7 @@ function doPost(e) {
     // The row is already saved, so an email failure (e.g. daily quota) shouldn't fail the registration.
     let emailSent = true;
     try {
-      sendConfirmation({ id, name, ssc, hsc, email, zellePhone, counts, total, updated });
+      sendConfirmation({ id, name, ssc, hsc, email, phone, meet, gala, zelleName, counts, infants, contribution, total, updated });
     } catch (mailErr) {
       console.error('Confirmation email failed for ' + id + ': ' + mailErr);
       emailSent = false;
@@ -101,25 +132,37 @@ function sendConfirmation(r) {
     .map((c, i) => ({ c, n: r.counts[i] }))
     .filter(x => x.n > 0)
     .map(x => `<tr><td>${esc(x.c.label)} (${x.n} × $${x.c.price})</td><td align="right">$${(x.n * x.c.price).toLocaleString()}</td></tr>`)
-    .join('');
+    .join('') + (r.infants > 0
+      ? `<tr><td>Children under 2 (${r.infants})</td><td align="right">Free</td></tr>`
+      : '') + (r.contribution > 0
+      ? `<tr><td>Additional contribution — thank you!</td><td align="right">$${r.contribution.toLocaleString()}</td></tr>`
+      : '');
 
   const html = `
     <div style="font-family:Arial,sans-serif;font-size:14px;color:#1a1a18;max-width:560px">
       <h2 style="margin:0 0 8px">${esc(EVENT_NAME)}</h2>
       <p>Dear ${esc(r.name)},</p>
-      <p>Thank you for registering! ${r.updated ? 'Your registration has been <strong>updated</strong> with the details below.' : 'Here are your registration details.'}</p>
+      <p>Thank you for registering! ${r.updated ? 'Your registration has been <strong>updated</strong> with the details below.' : 'We have received your registration details below.'}</p>
+      <p style="background:#fef3c7;border-left:4px solid #a16207;padding:10px 14px"><strong>Your registration is in progress — it is not confirmed yet.</strong></p>
       <p><strong>Registration ID:</strong> ${esc(r.id)}</p>
       <table cellpadding="6" style="border-collapse:collapse;width:100%;border:1px solid #e3e3de">
         <tr><td>Name</td><td align="right">${esc(r.name)}</td></tr>
+        <tr><td>Email</td><td align="right">${esc(r.email)}</td></tr>
+        <tr><td>Phone Number</td><td align="right">${esc(r.phone)}</td></tr>
         <tr><td>SSC Batch</td><td align="right">${esc(r.ssc)}</td></tr>
         <tr><td>HSC Batch</td><td align="right">${esc(r.hsc)}</td></tr>
-        <tr><td>Email</td><td align="right">${esc(r.email)}</td></tr>
-        <tr><td>Zelle Phone Number</td><td align="right">${esc(r.zellePhone)}</td></tr>
+        <tr><td>Meet, Greet &amp; Reminisce (Jan 30)</td><td align="right">${r.meet} ${r.meet === 1 ? 'person' : 'people'}</td></tr>
+        <tr><td>Gala Lunch (Jan 31)</td><td align="right">${r.gala} ${r.gala === 1 ? 'person' : 'people'}</td></tr>
+        <tr><td>Zelle Account Name</td><td align="right">${esc(r.zelleName)}</td></tr>
         ${lines}
         <tr style="border-top:2px solid #e3e3de"><td><strong>Total Due</strong></td><td align="right"><strong>$${r.total.toLocaleString()}</strong></td></tr>
       </table>
-      <p>Children under 2 attend free of charge.</p>
-      <p>The committee will match your Zelle payment using the phone number above. If anything is wrong, simply submit the form again with the same email address and it will replace this registration, or reply to this email.</p>
+      <h3 style="margin:20px 0 6px">Next step: complete your Zelle payment</h3>
+      <p>Please send your Total Due of <strong>$${r.total.toLocaleString()}</strong> via Zelle to:</p>
+      <p style="margin-left:14px">Zelle Recipient: <strong>${esc(ZELLE_RECIPIENT)}</strong><br>Zelle Phone Number: <strong>${esc(ZELLE_PHONE)}</strong></p>
+      <p><strong>Your Zelle payment is the official confirmation of your registration and attendance.</strong> Please save your Zelle confirmation number, as it will serve as your registration record.</p>
+      <p><strong>We will send you a confirmation email once we have received and confirmed your Zelle payment.</strong> Until then, your registration remains in progress.</p>
+      <p>If anything above is wrong, simply submit the form again with the same email address and it will replace this registration, or reply to this email.</p>
       <p>Warmly,<br>VIQI 75 Years’ Celebration in AZ Planning Committee</p>
     </div>`;
 
@@ -128,7 +171,7 @@ function sendConfirmation(r) {
     cc: ORGANIZER_EMAIL,
     replyTo: ORGANIZER_EMAIL,
     name: EVENT_NAME,
-    subject: `${r.updated ? 'Updated registration' : 'Registration confirmed'}: ${EVENT_NAME} (${r.id})`,
+    subject: `Registration in progress${r.updated ? ' (updated)' : ''}: ${EVENT_NAME} (${r.id})`,
     htmlBody: html,
   });
 }

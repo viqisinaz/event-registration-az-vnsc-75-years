@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Viqi Event Registration</title>
+<title>VIQI 75 Registration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap">
 
@@ -23,6 +23,8 @@
     --error-bg:    #fee2e2;
     --free:        #854d0e;
     --free-bg:     #fef9c3;
+    --gold:        #a16207;
+    --gold-bg:     #fef3c7;
     --shadow:      0 1px 3px rgba(0,0,0,0.07), 0 6px 18px rgba(0,0,0,0.07);
     --r:           14px;
     --r-sm:        9px;
@@ -46,6 +48,8 @@
       --error-bg:    #450a0a;
       --free:        #fbbf24;
       --free-bg:     #1c1400;
+      --gold:        #fbbf24;
+      --gold-bg:     #2a1f05;
       --shadow:      0 1px 3px rgba(0,0,0,0.35), 0 6px 18px rgba(0,0,0,0.3);
       color-scheme: dark;
     }
@@ -65,6 +69,8 @@
     --error-bg:    #450a0a;
     --free:        #fbbf24;
     --free-bg:     #1c1400;
+    --gold:        #fbbf24;
+    --gold-bg:     #2a1f05;
     --shadow:      0 1px 3px rgba(0,0,0,0.35), 0 6px 18px rgba(0,0,0,0.3);
     color-scheme: dark;
   }
@@ -133,13 +139,273 @@
     font-size: 14.5px;
   }
 
+  /* ─── Hero ────────────────────────────────────────────────────── */
+  .hero-eyebrow {
+    font-family: var(--font-d);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--gold) !important;
+    margin: 0 0 10px !important;
+  }
+
+  .page-header h1 .accent { color: var(--accent); display: block; }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .hero-meta span {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .hero-meta .deadline { background: var(--gold-bg); border-color: transparent; color: var(--gold); }
+
+  /* ─── Intro sections ──────────────────────────────────────────── */
+  .intro {
+    max-width: 860px;
+    margin: 0 auto;
+    display: grid;
+    gap: 20px;
+  }
+
+  .intro p { margin: 0 0 10px; }
+  .intro p:last-child { margin-bottom: 0; }
+
+  .welcome { font-size: 15.5px; border-top: 4px solid var(--accent); }
+
+  .welcome-greet {
+    font-family: var(--font-d);
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  .block-title {
+    font-family: var(--font-d);
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    margin: 0 0 4px;
+  }
+
+  .block-sub { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 18px !important; }
+
+  /* Events */
+  .events { display: grid; gap: 20px; }
+  @media (min-width: 640px) { .events { grid-template-columns: 1fr 1fr; } }
+
+  .event { display: flex; gap: 18px; align-items: flex-start; }
+
+  .event-date {
+    flex-shrink: 0;
+    width: 68px;
+    text-align: center;
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font-d);
+    line-height: 1.1;
+  }
+
+  .ed-mon {
+    display: block;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 5px 0;
+  }
+
+  .event.gala .ed-mon { background: var(--gold); }
+  .ed-day { display: block; font-size: 28px; font-weight: 800; padding: 6px 0 0; }
+  .ed-yr  { display: block; font-size: 11px; color: var(--fg-muted); padding: 2px 0 7px; }
+
+  .event-kicker {
+    font-family: var(--font-d);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 2px !important;
+  }
+
+  .event.gala .event-kicker { color: var(--gold); }
+
+  .event h2 {
+    font-family: var(--font-d);
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    line-height: 1.25;
+  }
+
+  .event p:last-child { color: var(--fg-muted); font-size: 14px; }
+
+  /* Fees */
+  .fee-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  @media (min-width: 720px) { .fee-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .fee {
+    border: 1.5px solid var(--border);
+    background: var(--surface-alt);
+    border-radius: var(--r-sm);
+    padding: 16px 14px;
+    text-align: center;
+  }
+
+  .fee-amt {
+    display: block;
+    font-family: var(--font-d);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--accent);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .fee-free .fee-amt { color: var(--success); }
+
+  .fee-who { display: block; font-size: 13px; line-height: 1.4; }
+
+  .give-note {
+    background: var(--gold-bg);
+    color: var(--fg);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-top: 14px;
+  }
+
+  /* Payment steps */
+  .steps { list-style: none; margin: 16px 0 0; padding: 0; }
+
+  .steps li {
+    display: flex;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 22px;
+  }
+
+  .steps li:last-child { padding-bottom: 0; }
+
+  /* connector line between step numbers */
+  .steps li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 34px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .step-n {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-family: var(--font-d);
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+  }
+
+  .steps strong { font-family: var(--font-d); font-size: 15px; display: block; margin: 4px 0 2px; }
+  .steps li p { color: var(--fg-muted); font-size: 14px; }
+
+  .zelle-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background: var(--accent-bg);
+    border-radius: var(--r-sm);
+    padding: 14px 16px;
+    margin: 10px 0;
+  }
+  @media (max-width: 440px) { .zelle-card { grid-template-columns: 1fr; } }
+
+  .zc-lbl {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .zc-val {
+    display: block;
+    font-family: var(--font-d);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .confirm-note {
+    background: var(--success-bg);
+    color: var(--success);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 20px;
+  }
+
+  /* Sign-off + divider into the form */
+  .signoff { text-align: center; padding: 6px 12px 0; color: var(--fg-muted); }
+  .signoff-sig { color: var(--fg); margin-top: 12px !important; }
+
+  .form-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 16px 0 4px;
+    font-family: var(--font-d);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+
+  .form-divider::before, .form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
   /* ─── Layout ──────────────────────────────────────────────────── */
   .layout {
     display: grid;
     grid-template-columns: 1fr;
     gap: 20px;
     max-width: 860px;
-    margin: 0 auto;
+    margin: 20px auto 0;
   }
 
   @media (min-width: 720px) {
@@ -185,7 +451,8 @@
 
   input[type="text"],
   input[type="email"],
-  input[type="tel"] {
+  input[type="tel"],
+  input[type="number"] {
     width: 100%;
     padding: 10px 14px;
     border: 1.5px solid var(--border);
@@ -203,6 +470,22 @@
     box-shadow: 0 0 0 3px var(--accent-bg);
   }
 
+  .money-input { position: relative; }
+
+  .money-input span {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--fg-muted);
+    font-weight: 500;
+    pointer-events: none;
+  }
+
+  .money-input input { padding-left: 28px; }
+
+  .field-hint { font-size: 12.5px; color: var(--fg-muted); margin: 6px 0 0; }
+
   .row2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -210,6 +493,18 @@
   }
 
   @media (max-width: 440px) { .row2 { grid-template-columns: 1fr; } }
+
+  /* Even spacing whether the two columns sit side by side or stack */
+  .row2 { margin-bottom: 16px; }
+  .row2 > .fg { margin-bottom: 0 !important; }
+  .section > .row2:last-child { margin-bottom: 0; }
+
+  /* Phones: question text gets the full width, price + stepper drop below */
+  @media (max-width: 480px) {
+    .cat-row { flex-wrap: wrap; row-gap: 10px; }
+    .cat-row .cat-info { flex: 1 1 100%; }
+    .cat-row .stepper { margin-left: auto; }
+  }
 
   /* ─── Category counter rows ───────────────────────────────────── */
   .cat-row {
@@ -239,6 +534,17 @@
     font-size: 14px;
     display: block;
     line-height: 1.3;
+  }
+
+  .cat-kicker {
+    display: block;
+    font-family: var(--font-d);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2px;
   }
 
   .cat-sub {
@@ -306,9 +612,7 @@
 
   /* ─── Free note ───────────────────────────────────────────────── */
   .free-note {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: block;
     background: var(--free-bg);
     color: var(--free);
     font-size: 12.5px;
@@ -460,6 +764,33 @@
     font-weight: 700;
   }
 
+  .s-icon.pending { background: var(--gold-bg); color: var(--gold); }
+
+  .next-step {
+    background: var(--gold-bg);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--r-sm);
+    padding: 14px 18px;
+    text-align: left;
+    margin: 0 0 20px;
+    font-size: 14px;
+  }
+
+  .next-step strong { font-family: var(--font-d); font-size: 15px; display: block; margin-bottom: 6px; }
+  .next-step p { margin: 0 0 6px; }
+  .next-step p:last-child { margin: 0; color: var(--fg-muted); }
+  .next-step a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+  .pending-note {
+    background: var(--gold-bg);
+    color: var(--fg);
+    font-size: 12.5px;
+    line-height: 1.5;
+    border-radius: var(--r-sm);
+    padding: 10px 12px;
+    margin: 16px 0 0;
+  }
+
   .success-wrap h2 {
     font-family: var(--font-d);
     font-size: 26px;
@@ -513,10 +844,103 @@
 <div id="app">
 
   <!-- Header -->
-  <header class="page-header" id="pageHeader">
-    <h1>VIQI 75 Years’ Celebration in AZ</h1>
-    <p>📅 January 30 &amp; 31, 2027 · Complete registration by October 30, 2026</p>
+  <div id="pageHeader">
+  <header class="page-header">
+    <div class="badge"><span class="badge-dot"></span> It’s time for registration!</div>
+    <p class="hero-eyebrow">Viqarunnisa Noon School &amp; College</p>
+    <h1>VIQI 75 Years’ Celebration <span class="accent">in Arizona</span></h1>
+    <div class="hero-meta">
+      <span>📅 January 30–31, 2027</span>
+      <span>📍 Arizona</span>
+      <span class="deadline">⏰ Complete registration by October 5, 2026</span>
+    </div>
   </header>
+
+  <div class="intro">
+
+    <!-- Welcome -->
+    <section class="card welcome">
+      <p class="welcome-greet">Dear VIQI Friends and Families,</p>
+      <p>We are excited to bring the VIQI community together in <strong>Arizona</strong> to celebrate 75 years of Viqarunnisa Noon School &amp; College!</p>
+      <p>The reunion is planned for January 30–31 and will include two special gatherings. Please complete this registration form for yourself and all members of your household who will be attending.</p>
+    </section>
+
+    <!-- The two gatherings -->
+    <div class="events">
+      <article class="card event">
+        <div class="event-date"><span class="ed-mon">Jan</span><span class="ed-day">30</span><span class="ed-yr">2027</span></div>
+        <div>
+          <p class="event-kicker">Day 1</p>
+          <h2>Meet, Greet &amp; Reminisce</h2>
+          <p>A gathering to reconnect, catch up, share memories, fun &amp; laughter, take lots of photos, and enjoy time together.</p>
+        </div>
+      </article>
+      <article class="card event gala">
+        <div class="event-date"><span class="ed-mon">Jan</span><span class="ed-day">31</span><span class="ed-yr">2027</span></div>
+        <div>
+          <p class="event-kicker">Day 2</p>
+          <h2>Gala Lunch</h2>
+          <p>A celebratory gathering with food and cultural programs where we will create new memories while reliving the old ones.</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- Fees -->
+    <section class="card">
+      <h2 class="block-title">Participation Fees</h2>
+      <p class="block-sub">Minimum participation fees for the 2-day event</p>
+      <div class="fee-grid">
+        <div class="fee"><span class="fee-amt">$150</span><span class="fee-who">VIQI Alumna / Alumnus</span></div>
+        <div class="fee"><span class="fee-amt">$75</span><span class="fee-who">VIQI Alumni Student / Guest over age 10</span></div>
+        <div class="fee"><span class="fee-amt">$50</span><span class="fee-who">Children ages 2–10</span></div>
+        <div class="fee fee-free"><span class="fee-amt">Free</span><span class="fee-who">Children under age 2</span></div>
+      </div>
+      <p>These fees represent the minimum contribution needed to help us cover the costs of organizing and hosting the reunion.</p>
+      <div class="give-note">💛 We would also be very grateful to those who are able and would like to contribute more than the minimum participation fee. Any additional contribution will help us make this 75-year celebration a successful and memorable event for everyone.</div>
+    </section>
+
+    <!-- Payment -->
+    <section class="card">
+      <h2 class="block-title">Registration Confirmation &amp; Payment</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-n">1</span>
+          <div>
+            <strong>Complete this form</strong>
+            <p>Register yourself and all members of your household who will be attending.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-n">2</span>
+          <div>
+            <strong>Send your total payment via Zelle</strong>
+            <div class="zelle-card">
+              <div><span class="zc-lbl">Zelle Recipient</span><span class="zc-val">Sabira Enayet</span></div>
+              <div><span class="zc-lbl">Zelle Phone Number</span><a class="zc-val" href="tel:+14805439295">(480) 543-9295</a></div>
+            </div>
+            <p>Your Zelle payment will serve as the official confirmation of your registration and attendance.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-n">3</span>
+          <div>
+            <strong>Save your Zelle confirmation / reference number</strong>
+            <p>This will serve as your registration record.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="confirm-note">✓ Submitting this form <strong>starts</strong> your registration. It will be considered confirmed once we have received both your completed registration information and your Zelle payment. We will send you a confirmation email once your Zelle payment is received and confirmed.</div>
+    </section>
+
+    <!-- Sign-off -->
+    <section class="signoff">
+      <p>Thank you for helping us plan ahead. We are looking forward to reconnecting, reminiscing, and celebrating 75 years of VNSC together!</p>
+      <p class="signoff-sig">Warmly,<br><strong>VIQI 75 Years’ Celebration in AZ Planning Committee</strong></p>
+    </section>
+
+    <div class="form-divider">Registration Form</div>
+  </div>
+  </div>
 
   <!-- Form + Summary -->
   <div class="layout" id="formLayout">
@@ -524,7 +948,7 @@
     <!-- Left: form -->
     <div>
       <!-- action = Google Apps Script web app URL (see apps-script/SETUP.md) -->
-      <form id="regForm" action="https://script.google.com/macros/s/AKfycbw0gzZ_jq01xT2-TBbQDz_Yjtnob5o49w7I1WHWaM2W43QS7UDfFgVV6LLBgFzmo_J0/exec" method="POST">
+      <form id="regForm" action="https://script.google.com/macros/s/AKfycbxNaEjgbjp8qr_T8qvVIatXGYvU83yZ75XGRMTbTbgVYNhWl3VlLpG6T1x0R8jFXHbo/exec" method="POST">
         <div class="card">
 
           <!-- Personal Info -->
@@ -532,94 +956,154 @@
             <p class="sec-label">Your Information</p>
             <div class="fg">
               <label class="fl" for="fullName">Full Name *</label>
-              <input type="text" id="fullName" name="Full Name" required placeholder="Your full name">
+              <input type="text" id="fullName" name="Full Name" required autocomplete="name" placeholder="Your full name">
             </div>
             <div class="row2">
               <div class="fg">
+                <label class="fl" for="email">Email Address *</label>
+                <input type="email" id="email" name="Email" required autocomplete="email" placeholder="your@email.com">
+              </div>
+              <div class="fg">
+                <label class="fl" for="phone">Phone Number *</label>
+                <input type="tel" id="phone" name="Phone Number" required autocomplete="tel" placeholder="e.g. (480) 555-0123">
+              </div>
+            </div>
+            <div class="row2">
+              <div class="fg" style="margin-bottom:0">
                 <label class="fl" for="sscBatch">SSC Batch *</label>
                 <input type="text" id="sscBatch" name="SSC Batch" required placeholder="e.g. 2010">
               </div>
-              <div class="fg">
+              <div class="fg" style="margin-bottom:0">
                 <label class="fl" for="hscBatch">HSC Batch *</label>
                 <input type="text" id="hscBatch" name="HSC Batch" required placeholder="e.g. 2012">
               </div>
             </div>
-            <div class="fg" style="margin-bottom:0">
-              <label class="fl" for="email">Email Address *</label>
-              <input type="email" id="email" name="Email" required placeholder="your@email.com">
+          </div>
+
+          <!-- Event Attendance -->
+          <div class="section">
+            <p class="sec-label">Event Attendance</p>
+            <div class="cat-row" id="meetrow">
+              <div class="cat-info">
+                <span class="cat-kicker">January 30, 2027</span>
+                <span class="cat-title">How many people from your household will join the Meet, Greet &amp; Reminisce event?</span>
+                <span class="cat-sub">Please include yourself.</span>
+              </div>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('meet',-1)" aria-label="Fewer: How many people from your household will join the Meet, Greet &amp; Reminisce event?">−</button>
+                <div class="step-val" id="meetval">0</div>
+                <button type="button" class="step-btn" onclick="step('meet',1)" aria-label="More: How many people from your household will join the Meet, Greet &amp; Reminisce event?">+</button>
+              </div>
+            </div>
+            <div class="cat-row" id="galarow">
+              <div class="cat-info">
+                <span class="cat-kicker">January 31, 2027</span>
+                <span class="cat-title">How many people from your household will join the Gala Lunch?</span>
+                <span class="cat-sub">Please include yourself.</span>
+              </div>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('gala',-1)" aria-label="Fewer: How many people from your household will join the Gala Lunch?">−</button>
+                <div class="step-val" id="galaval">0</div>
+                <button type="button" class="step-btn" onclick="step('gala',1)" aria-label="More: How many people from your household will join the Gala Lunch?">+</button>
+              </div>
             </div>
           </div>
 
           <!-- Category Counts -->
           <div class="section">
-            <p class="sec-label">Number of Attendees per Category</p>
-
+            <p class="sec-label">Participation Fee Calculation for the 2-Day Event</p>
             <!-- Category 1 -->
             <div class="cat-row" id="cat1row">
               <div class="cat-info">
-                <span class="cat-title">Viqi Alumni</span>
-                <span class="cat-sub">Former students of Viqi</span>
+                <span class="cat-kicker">Category 1</span>
+                <span class="cat-title">Number of VIQI Alumni attending</span>
               </div>
-              <span class="cat-price-tag">$150<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <span class="cat-price-tag">$150<small style="font-size:10px;font-weight:500;opacity:.65"> each</small></span>
               <div class="stepper">
-                <button type="button" class="step-btn" onclick="step('cat1',-1)">−</button>
+                <button type="button" class="step-btn" onclick="step('cat1',-1)" aria-label="Fewer: Number of VIQI Alumni attending">−</button>
                 <div class="step-val" id="cat1val">0</div>
-                <button type="button" class="step-btn" onclick="step('cat1',1)">+</button>
+                <button type="button" class="step-btn" onclick="step('cat1',1)" aria-label="More: Number of VIQI Alumni attending">+</button>
               </div>
             </div>
 
             <!-- Category 2 -->
             <div class="cat-row" id="cat2row">
               <div class="cat-info">
-                <span class="cat-title">Student / Guest (above 10 yrs)</span>
-                <span class="cat-sub">Students or any guest over 10 years old</span>
+                <span class="cat-kicker">Category 2</span>
+                <span class="cat-title">Number of VIQI Alumni Students / Guests over age 10 attending</span>
               </div>
-              <span class="cat-price-tag">$75<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <span class="cat-price-tag">$75<small style="font-size:10px;font-weight:500;opacity:.65"> each</small></span>
               <div class="stepper">
-                <button type="button" class="step-btn" onclick="step('cat2',-1)">−</button>
+                <button type="button" class="step-btn" onclick="step('cat2',-1)" aria-label="Fewer: Number of VIQI Alumni Students / Guests over age 10 attending">−</button>
                 <div class="step-val" id="cat2val">0</div>
-                <button type="button" class="step-btn" onclick="step('cat2',1)">+</button>
+                <button type="button" class="step-btn" onclick="step('cat2',1)" aria-label="More: Number of VIQI Alumni Students / Guests over age 10 attending">+</button>
               </div>
             </div>
 
             <!-- Category 3 -->
             <div class="cat-row" id="cat3row">
               <div class="cat-info">
-                <span class="cat-title">Child (above 2 yrs, under 10 yrs)</span>
-                <span class="cat-sub">Children aged 2–10 years</span>
+                <span class="cat-kicker">Category 3</span>
+                <span class="cat-title">Number of children ages 2–10 attending</span>
               </div>
-              <span class="cat-price-tag">$50<small style="font-size:10px;font-weight:500;opacity:.65">/person</small></span>
+              <span class="cat-price-tag">$50<small style="font-size:10px;font-weight:500;opacity:.65"> each</small></span>
               <div class="stepper">
-                <button type="button" class="step-btn" onclick="step('cat3',-1)">−</button>
+                <button type="button" class="step-btn" onclick="step('cat3',-1)" aria-label="Fewer: Number of children ages 2–10 attending">−</button>
                 <div class="step-val" id="cat3val">0</div>
-                <button type="button" class="step-btn" onclick="step('cat3',1)">+</button>
+                <button type="button" class="step-btn" onclick="step('cat3',1)" aria-label="More: Number of children ages 2–10 attending">+</button>
               </div>
             </div>
 
-            <div class="free-note">
-              🍼 Children under 2 years old attend <strong>free of charge</strong> — no registration needed.
+            <!-- Category 4 -->
+            <div class="cat-row" id="cat4row">
+              <div class="cat-info">
+                <span class="cat-kicker">Category 4</span>
+                <span class="cat-title">Number of children under age 2 attending</span>
+              </div>
+              <span class="cat-price-tag" style="color:var(--success)">Free</span>
+              <div class="stepper">
+                <button type="button" class="step-btn" onclick="step('cat4',-1)" aria-label="Fewer: Number of children under age 2 attending">−</button>
+                <div class="step-val" id="cat4val">0</div>
+                <button type="button" class="step-btn" onclick="step('cat4',1)" aria-label="More: Number of children under age 2 attending">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Contribution -->
+          <div class="section">
+            <p class="sec-label">Additional Contribution (Optional)</p>
+            <div class="fg" style="margin-bottom:0">
+              <label class="fl" for="contribution">Amount you'd like to contribute beyond the minimum fees</label>
+              <div class="money-input">
+                <span>$</span>
+                <input type="number" id="contribution" name="Additional Contribution" min="0" max="100000" step="1" inputmode="numeric" placeholder="0">
+              </div>
+              <p class="field-hint">💛 Thank you! This is added to your Total Due.</p>
             </div>
           </div>
 
           <!-- Zelle Payment -->
           <div class="section">
             <p class="sec-label">Zelle Payment</p>
-            <!-- TODO: replace the placeholder with the real Zelle recipient number -->
             <div class="free-note" style="margin:0 0 16px">
-              💵 Send your Total Due by Zelle to <strong>(000) 000-0000</strong>, then enter the phone number you paid from below.
+              💵 Send your Total Due by Zelle to <strong>Sabira Enayet · (480) 543-9295</strong>.<br>
+              <strong>Please save your Zelle confirmation number.</strong> Your Zelle payment serves as the confirmation of your registration and attendance. We’ll send you a confirmation email once we have received and confirmed your payment.
             </div>
             <div class="fg" style="margin-bottom:0">
-              <label class="fl" for="zellePhone">Zelle Phone Number *</label>
-              <input type="tel" id="zellePhone" name="Zelle Phone Number" required autocomplete="tel" placeholder="e.g. (480) 555-0123">
+              <label class="fl" for="zelleName">Name associated with the Zelle account to be used for payment *</label>
+              <input type="text" id="zelleName" name="Zelle Account Name" required placeholder="Name as it appears on Zelle">
             </div>
           </div>
 
         </div>
 
         <!-- Hidden fields submitted with form -->
+        <input type="hidden" id="hMeet" name="Meet and Greet Headcount" value="0">
+        <input type="hidden" id="hGala" name="Gala Lunch Headcount" value="0">
         <input type="hidden" id="hCat1" name="Viqi Alumni Count" value="0">
         <input type="hidden" id="hCat2" name="Student/Guest Count" value="0">
         <input type="hidden" id="hCat3" name="Child Count" value="0">
+        <input type="hidden" id="hCat4" name="Children Under 2 Count" value="0">
         <input type="hidden" id="hTotal" name="Total Amount" value="$0">
       </form>
     </div>
@@ -630,7 +1114,7 @@
         <h3>Cost Breakdown</h3>
 
         <div class="br-row">
-          <span class="br-name">Viqi Alumni</span>
+          <span class="br-name">VIQI Alumni</span>
           <span class="br-calc" id="b1calc">0 × $150</span>
           <span class="br-sub zero" id="b1sub">$0</span>
         </div>
@@ -644,6 +1128,16 @@
           <span class="br-calc" id="b3calc">0 × $50</span>
           <span class="br-sub zero" id="b3sub">$0</span>
         </div>
+        <div class="br-row">
+          <span class="br-name">Children under 2</span>
+          <span class="br-calc" id="b5calc">0 × Free</span>
+          <span class="br-sub zero">$0</span>
+        </div>
+        <div class="br-row">
+          <span class="br-name">Additional contribution</span>
+          <span class="br-calc"></span>
+          <span class="br-sub zero" id="b4sub">$0</span>
+        </div>
 
         <div class="total-row">
           <span class="total-lbl">Total Due</span>
@@ -651,12 +1145,13 @@
         </div>
 
         <button type="submit" form="regForm" class="submit-btn" id="submitBtn">
-          Complete Registration
+          Submit Registration
         </button>
         <div class="err-banner" id="errBanner">
           Something went wrong. Please try again or contact viqis.in.az@gmail.com
         </div>
-        <p class="form-note">A confirmation email will be sent to you and to viqis.in.az@gmail.com.</p>
+        <p class="pending-note"><strong>Submitting this form starts your registration.</strong> It is confirmed only after we receive and verify your Zelle payment. Please save your Zelle confirmation number. We’ll email you a confirmation once your payment is confirmed.</p>
+        <p class="form-note">A “registration in progress” email will be sent to you and to viqis.in.az@gmail.com.</p>
       </div>
     </div>
 
@@ -670,9 +1165,14 @@
   <!-- Success -->
   <div id="successScreen" hidden>
     <div class="success-wrap">
-      <div class="s-icon">✓</div>
-      <h2>Registration Received!</h2>
-      <p id="successMsg">Thank you! A confirmation email is on its way to you and to viqis.in.az@gmail.com.</p>
+      <div class="s-icon pending">⏳</div>
+      <h2>Registration In Progress</h2>
+      <p id="successMsg">Thank you! Your registration has been received.</p>
+      <div class="next-step">
+        <strong>Next step: send <span id="dueAmt"></span> via Zelle to confirm</strong>
+        <p>Zelle Recipient: <b>Sabira Enayet</b> · Phone: <a href="tel:+14805439295">(480) 543-9295</a></p>
+        <p>Your Zelle payment is the official confirmation of your registration and attendance. <strong>Please save your Zelle confirmation number.</strong> We’ll send you a confirmation email once we have received and confirmed your Zelle payment.</p>
+      </div>
       <div class="receipt" id="receipt"></div>
     </div>
   </div>
@@ -681,12 +1181,14 @@
 
 <script>
   // ── Counts state ─────────────────────────────────────────────────
-  const counts = { cat1: 0, cat2: 0, cat3: 0 };
+  const counts = { meet: 0, gala: 0, cat1: 0, cat2: 0, cat3: 0, cat4: 0 };
   const rates  = { cat1: 150, cat2: 75, cat3: 50 };
   const MAX = 10;
+  const EVENT_MAX = 40; // household headcount per event
 
   function step(id, delta) {
-    counts[id] = Math.max(0, Math.min(MAX, counts[id] + delta));
+    const max = (id === 'meet' || id === 'gala') ? EVENT_MAX : MAX;
+    counts[id] = Math.max(0, Math.min(max, counts[id] + delta));
     document.getElementById(id + 'val').textContent = counts[id];
     document.getElementById('h' + id.charAt(0).toUpperCase() + id.slice(1)).value = counts[id];
 
@@ -701,6 +1203,14 @@
     d.textContent = v;
     return d.innerHTML;
   }
+
+  // Whole dollars only; blank, negative or invalid input counts as $0
+  function contribution() {
+    const n = Math.round(parseFloat(document.getElementById('contribution').value));
+    return Number.isFinite(n) ? Math.max(0, Math.min(100000, n)) : 0;
+  }
+
+  document.getElementById('contribution').addEventListener('input', updateBreakdown);
 
   function fmt(n) { return '$' + n.toLocaleString(); }
 
@@ -721,6 +1231,14 @@
       subEl.classList.toggle('zero', sub === 0);
     });
 
+    document.getElementById('b5calc').textContent = `${counts.cat4} × Free`;
+
+    const extra = contribution();
+    grand += extra;
+    const extraEl = document.getElementById('b4sub');
+    extraEl.textContent = fmt(extra);
+    extraEl.classList.toggle('zero', extra === 0);
+
     const totalEl = document.getElementById('totalAmt');
     totalEl.textContent = fmt(grand);
     totalEl.classList.toggle('zero', grand === 0);
@@ -732,6 +1250,10 @@
     e.preventDefault();
 
     // Require at least one person
+    if (counts.meet + counts.gala === 0) {
+      alert('Please tell us how many people from your household will join at least one of the two events.');
+      return;
+    }
     if (counts.cat1 + counts.cat2 + counts.cat3 === 0) {
       alert('Please add at least one attendee before submitting.');
       return;
@@ -758,8 +1280,10 @@
       const ssc      = esc(document.getElementById('sscBatch').value);
       const hsc      = esc(document.getElementById('hscBatch').value);
       const email    = esc(document.getElementById('email').value);
-      const zPhone   = esc(document.getElementById('zellePhone').value);
-      const grand    = counts.cat1*150 + counts.cat2*75 + counts.cat3*50;
+      const phone    = esc(document.getElementById('phone').value);
+      const zName    = esc(document.getElementById('zelleName').value);
+      const extra    = contribution();
+      const grand    = counts.cat1*150 + counts.cat2*75 + counts.cat3*50 + extra;
 
       let rows = `
         <div class="rc-row"><span>Registration ID</span><span>${esc(data.id)}</span></div>
@@ -767,11 +1291,16 @@
         <div class="rc-row"><span>SSC Batch</span><span>${ssc}</span></div>
         <div class="rc-row"><span>HSC Batch</span><span>${hsc}</span></div>
         <div class="rc-row"><span>Email</span><span>${email}</span></div>
-        <div class="rc-row"><span>Zelle Phone Number</span><span>${zPhone}</span></div>`;
+        <div class="rc-row"><span>Phone Number</span><span>${phone}</span></div>
+        <div class="rc-row"><span>Meet, Greet &amp; Reminisce (Jan 30)</span><span>${counts.meet} ${counts.meet === 1 ? 'person' : 'people'}</span></div>
+        <div class="rc-row"><span>Gala Lunch (Jan 31)</span><span>${counts.gala} ${counts.gala === 1 ? 'person' : 'people'}</span></div>
+        <div class="rc-row"><span>Zelle Account Name</span><span>${zName}</span></div>`;
 
-      if (counts.cat1) rows += `<div class="rc-row"><span>Viqi Alumni (${counts.cat1})</span><span>${fmt(counts.cat1*150)}</span></div>`;
+      if (counts.cat1) rows += `<div class="rc-row"><span>VIQI Alumni (${counts.cat1})</span><span>${fmt(counts.cat1*150)}</span></div>`;
       if (counts.cat2) rows += `<div class="rc-row"><span>Students/Guests (${counts.cat2})</span><span>${fmt(counts.cat2*75)}</span></div>`;
       if (counts.cat3) rows += `<div class="rc-row"><span>Children (${counts.cat3})</span><span>${fmt(counts.cat3*50)}</span></div>`;
+      if (counts.cat4) rows += `<div class="rc-row"><span>Children under 2 (${counts.cat4})</span><span>Free</span></div>`;
+      if (extra) rows += `<div class="rc-row"><span>Additional contribution</span><span>${fmt(extra)}</span></div>`;
       rows += `<div class="rc-row rc-total"><span>Total Due</span><span>${fmt(grand)}</span></div>`;
 
       document.getElementById('receipt').innerHTML = rows;
@@ -780,18 +1309,19 @@
       document.getElementById('contactNote').hidden = true;
       document.getElementById('successScreen').hidden = false;
 
+      document.getElementById('dueAmt').textContent = fmt(grand);
       const mailNote = data.emailSent === false
-        ? 'We couldn’t send the confirmation email right now, so please save this page. The committee has your registration.'
-        : 'A confirmation email is on its way to you and to viqis.in.az@gmail.com.';
+        ? 'We couldn’t send the email right now, so please save this page. The committee has your registration.'
+        : 'A “registration in progress” email is on its way to you and to viqis.in.az@gmail.com.';
       document.getElementById('successMsg').textContent = (data.updated
         ? 'You had already registered with this email, so your registration has been updated. '
-        : 'Thank you! ') + mailNote;
+        : 'Thank you! Your registration has been received and is in progress. ') + mailNote;
 
     } catch (ex) {
       err.textContent = (ex && ex.userMessage) || 'Something went wrong. Please try again or contact viqis.in.az@gmail.com';
       err.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Complete Registration';
+      btn.textContent = 'Submit Registration';
     }
   });
 </script>
