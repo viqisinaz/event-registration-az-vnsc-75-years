@@ -6,7 +6,7 @@ URL goes into `index.html`, and that URL can only add rows, not read them.
 
 For every submission the backend:
 
-- stores a row with the ID `vnsc_75_az_<email>`. If the same email registers again, that row is updated, not duplicated.
+- stores a row with the ID `vnsc_az_75_<name>_<ssc>_<hsc>_<phone-number>` (for example `vnsc_az_75_jane-doe_2010_2012_4805550123`). If someone registers again with the same name, batches and phone number, that row is updated, not duplicated.
 - recalculates the total from the category counts ($150 / $75 / $50).
 - emails a confirmation to the registrant, with viqis.in.az@gmail.com on CC.
 

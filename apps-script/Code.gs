@@ -4,8 +4,9 @@
  * Lives inside the private Google Sheet (Extensions → Apps Script), so the
  * responses never touch the public GitHub repo. See apps-script/SETUP.md.
  *
- * Each registration is stored under the ID vnsc_75_az_<email>. Submitting
- * again with the same email updates that row instead of adding a new one.
+ * Each registration is stored under the ID vnsc_az_75_<name>_<ssc>_<hsc>_<phone>
+ * (see makeId). Submitting again with the same name, batches and phone number
+ * updates that row instead of adding a new one.
  */
 
 const ORGANIZER_EMAIL = 'viqis.in.az@gmail.com';
@@ -17,31 +18,40 @@ const SHEET_NAME = 'Registrations';
 // Keep in sync with the prices shown in index.html. Totals are recalculated
 // here so an edited page can't change what gets recorded.
 const CATEGORIES = [
-  { field: 'Viqi Alumni Count',   label: 'Viqi Alumni',                         price: 150 },
-  { field: 'Student/Guest Count', label: 'Student / Guest (above 10 yrs)',      price: 75 },
-  { field: 'Child Count',         label: 'Child (above 2 yrs, under 10 yrs)',   price: 50 },
+  { field: 'Viqi Alumni Count',   label: 'VIQI Alumni',                               price: 150 },
+  { field: 'Student/Guest Count', label: 'VIQI Alumni Students / Guests over age 10', price: 75 },
+  { field: 'Child Count',         label: 'Children ages 2–10',                        price: 50 },
 ];
 const MAX_PER_CATEGORY = 10;
 const MAX_CONTRIBUTION = 100000;
 
-const HEADERS = [
-  'Registration ID', 'Submitted At', 'Last Updated At',
-  'Full Name', 'SSC Batch', 'HSC Batch', 'Email',
-  ...CATEGORIES.map(c => c.label),
-  'Total Due ($)',
-  // Added later, so they sit at the end to keep earlier rows aligned
-  'Zelle Phone Number (no longer collected)',   // retired columns keep their place
-  'Zelle Confirmation # (no longer collected)', // so older rows stay aligned
-  'Additional Contribution ($)',
-  'Children under 2 (free)',
-  'Phone Number',
-  'Meet & Greet Headcount (Jan 30)',
-  'Gala Lunch Headcount (Jan 31)',
-  'Zelle Account Name',
+// Sheet columns, in the same order as the form. Rows are written by header
+// name, and getSheet() rearranges an older sheet to match this list, so the
+// order can change without misaligning anyone's answers.
+// `was` lists earlier names for the same column.
+const COLUMNS = [
+  { header: 'Registration ID' },
+  { header: 'Submitted At' },
+  { header: 'Last Updated At' },
+  { header: 'Full Name' },
+  { header: 'Email' },
+  { header: 'Phone Number' },
+  { header: 'SSC Batch' },
+  { header: 'HSC Batch' },
+  { header: 'Meet & Greet Headcount (Jan 30)' },
+  { header: 'Gala Lunch Headcount (Jan 31)' },
+  { header: 'Category 1: VIQI Alumni ($150)',                          was: ['Viqi Alumni'] },
+  { header: 'Category 2: VIQI Alumni Students / Guests over 10 ($75)', was: ['Student / Guest (above 10 yrs)'] },
+  { header: 'Category 3: Children ages 2–10 ($50)',                    was: ['Child (above 2 yrs, under 10 yrs)'] },
+  { header: 'Category 4: Children under 2 (Free)',                     was: ['Children under 2 (free)'] },
+  { header: 'Additional Contribution ($)' },
+  { header: 'Total Due ($)' },
+  { header: 'Zelle Account Name' },
+  // No longer on the form; kept at the end so older answers aren't lost
+  { header: 'Zelle Phone Number (no longer collected)', was: ['Zelle Phone Number'], retired: true },
+  { header: 'Zelle Confirmation # (no longer collected)', was: ['Zelle Confirmation #'], retired: true },
 ];
-const RETIRED_COLS = HEADERS
-  .map((h, i) => (h.indexOf('(no longer collected)') !== -1 ? i : -1))
-  .filter(i => i !== -1);
+const HEADERS = COLUMNS.map(c => c.header);
 const MAX_EVENT_HEADCOUNT = 40;
 
 function doPost(e) {
@@ -82,7 +92,7 @@ function doPost(e) {
     const infants = Number.isFinite(infantsRaw) ? Math.max(0, Math.min(MAX_PER_CATEGORY, infantsRaw)) : 0;
     const fees = counts.reduce((sum, n, i) => sum + n * CATEGORIES[i].price, 0);
     const total = fees + contribution;
-    const id = 'vnsc_75_az_' + email;
+    const id = makeId(name, ssc, hsc, phone);
     const now = new Date();
 
     // Serialize writes so two submissions at once can't clobber each other.
@@ -91,10 +101,29 @@ function doPost(e) {
     let updated = false;
     try {
       const sheet = getSheet();
-      const rowValues = [id, now, now, name, ssc, hsc, email, ...counts, total, '', '', contribution, infants, phone, meet, gala, zelleName].map(safeCell);
+      const record = {
+        'Registration ID': id,
+        'Submitted At': now,
+        'Last Updated At': now,
+        'Full Name': name,
+        'Email': email,
+        'Phone Number': phone,
+        'SSC Batch': ssc,
+        'HSC Batch': hsc,
+        'Meet & Greet Headcount (Jan 30)': meet,
+        'Gala Lunch Headcount (Jan 31)': gala,
+        'Category 1: VIQI Alumni ($150)': counts[0],
+        'Category 2: VIQI Alumni Students / Guests over 10 ($75)': counts[1],
+        'Category 3: Children ages 2–10 ($50)': counts[2],
+        'Category 4: Children under 2 (Free)': infants,
+        'Additional Contribution ($)': contribution,
+        'Total Due ($)': total,
+        'Zelle Account Name': zelleName,
+      };
+      const rowValues = HEADERS.map(h => (h in record ? safeCell(record[h]) : ''));
 
       const ids = sheet.getLastRow() > 1
-        ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().map(r => r[0])
+        ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().map(r => String(r[0]))
         : [];
       const existing = ids.indexOf(id);
 
@@ -102,8 +131,11 @@ function doPost(e) {
         sheet.appendRow(rowValues);
       } else {
         const row = existing + 2;
-        rowValues[1] = sheet.getRange(row, 2).getValue(); // keep original submission time
-        RETIRED_COLS.forEach(i => { rowValues[i] = sheet.getRange(row, i + 1).getValue(); }); // keep older answers
+        // Keep the original submission time and any answers to retired questions
+        const before = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
+        COLUMNS.forEach((c, i) => {
+          if (c.retired || c.header === 'Submitted At') rowValues[i] = before[i];
+        });
         sheet.getRange(row, 1, 1, rowValues.length).setValues([rowValues]);
         updated = true;
       }
@@ -162,7 +194,7 @@ function sendConfirmation(r) {
       <p style="margin-left:14px">Zelle Recipient: <strong>${esc(ZELLE_RECIPIENT)}</strong><br>Zelle Phone Number: <strong>${esc(ZELLE_PHONE)}</strong></p>
       <p><strong>Your Zelle payment is the official confirmation of your registration and attendance.</strong> Please save your Zelle confirmation number, as it will serve as your registration record.</p>
       <p><strong>We will send you a confirmation email once we have received and confirmed your Zelle payment.</strong> Until then, your registration remains in progress.</p>
-      <p>If anything above is wrong, simply submit the form again with the same email address and it will replace this registration, or reply to this email.</p>
+      <p>If anything above is wrong, simply submit the form again with the same full name, SSC batch, HSC batch and phone number and it will replace this registration, or reply to this email.</p>
       <p>Warmly,<br>VIQI 75 Years’ Celebration in AZ Planning Committee</p>
     </div>`;
 
@@ -180,13 +212,80 @@ function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
-  // Rewriting the header row each time also adds any new columns to an existing sheet.
+  migrateLayout(sheet);
+  migrateIds(sheet);
   sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
   sheet.setFrozenRows(1);
   return sheet;
 }
 
-/** Run once from the editor to create the sheet and grant permissions. */
+/**
+ * If the sheet's columns don't match HEADERS, rearrange every row to match,
+ * moving each value by its column name. Saves a backup copy of the tab first.
+ * Columns it doesn't recognize (e.g. your own "Paid?" notes) move to the end.
+ * Only values move; rows stay put, so row colors and highlights stay with them.
+ */
+function migrateLayout(sheet) {
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+  if (lastRow === 0 || lastCol === 0) return; // brand-new sheet
+
+  const data = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+  const oldHeaders = data[0].map(h => String(h).trim());
+  if (HEADERS.every((h, i) => oldHeaders[i] === h)) return; // already in order
+
+  const stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+  sheet.copyTo(sheet.getParent()).setName(SHEET_NAME + ' backup ' + stamp);
+
+  const source = COLUMNS.map(c => {
+    const names = [c.header].concat(c.was || []);
+    for (const n of names) {
+      const i = oldHeaders.indexOf(n);
+      if (i !== -1) return i;
+    }
+    return -1; // new column: starts empty
+  });
+  const used = new Set(source.filter(i => i !== -1));
+  const extras = oldHeaders.map((h, i) => i).filter(i => !used.has(i) && oldHeaders[i] !== '');
+
+  const headers = HEADERS.concat(extras.map(i => oldHeaders[i]));
+  const rows = data.slice(1).map(r => source.map(i => (i === -1 ? '' : r[i])).concat(extras.map(i => r[i])));
+
+  sheet.clearContents();
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  if (rows.length) sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  console.log('Rearranged ' + rows.length + ' rows to the new column order. Backup: "' + SHEET_NAME + ' backup ' + stamp + '"');
+}
+
+/**
+ * "Jane  Doe", "2010", "2012", "(480) 555-0123" →
+ * "vnsc_az_75_jane-doe_2010_2012_4805550123". Case, extra spaces, punctuation
+ * and phone formatting don't matter, so small typing differences still match.
+ */
+function makeId(name, ssc, hsc, phone) {
+  const slug = v => String(v).trim().toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+  // Digits only; "+1 480…" and "480…" are the same US number
+  let digits = String(phone == null ? '' : phone).replace(/\D/g, '');
+  if (digits.length === 11 && digits[0] === '1') digits = digits.slice(1);
+  return ['vnsc_az_75', slug(name), slug(ssc), slug(hsc), digits].filter(Boolean).join('_');
+}
+
+/** Bring every row's ID up to the current format (earlier rows used other formats). */
+function migrateIds(sheet) {
+  const n = sheet.getLastRow() - 1;
+  if (n < 1) return;
+  const data = sheet.getRange(2, 1, n, HEADERS.length).getValues();
+  const at = h => HEADERS.indexOf(h);
+  let changed = false;
+  const ids = data.map(r => {
+    const id = makeId(r[at('Full Name')], r[at('SSC Batch')], r[at('HSC Batch')], r[at('Phone Number')]);
+    if (id !== String(r[0])) changed = true;
+    return [id];
+  });
+  if (changed) sheet.getRange(2, 1, n, 1).setValues(ids);
+}
+
+/** Run from the editor to create the sheet (or reorder its columns) and grant permissions. */
 function setup() {
   getSheet();
   console.log('Ready. Remaining email quota today: ' + MailApp.getRemainingDailyQuota());
