@@ -7,6 +7,10 @@
  * Each registration is stored under the ID vnsc_az_75_<name>_<ssc>_<hsc>_<phone>
  * (see makeId). Submitting again with the same name, batches and phone number
  * updates that row instead of adding a new one.
+ *
+ * Payment check: fill in "Zelle Confirmation #" (and optionally "Amount
+ * Received ($)") for a row, then tick "Payment Confirmed". That sends the
+ * "Registration Confirmed" email once and stamps "Confirmation Email Sent At".
  */
 
 const ORGANIZER_EMAIL = 'viqis.in.az@gmail.com';
@@ -47,9 +51,14 @@ const COLUMNS = [
   { header: 'Additional Contribution ($)' },
   { header: 'Total Due ($)' },
   { header: 'Zelle Account Name' },
+  // Filled in by the committee when checking Zelle (see onPaymentEdit).
+  // Earlier versions of the form collected the confirmation # directly.
+  { header: 'Zelle Confirmation #', was: ['Zelle Confirmation # (no longer collected)'], admin: true },
+  { header: 'Amount Received ($)', admin: true },
+  { header: 'Payment Confirmed', admin: true },
+  { header: 'Confirmation Email Sent At', admin: true },
   // No longer on the form; kept at the end so older answers aren't lost
   { header: 'Zelle Phone Number (no longer collected)', was: ['Zelle Phone Number'], retired: true },
-  { header: 'Zelle Confirmation # (no longer collected)', was: ['Zelle Confirmation #'], retired: true },
 ];
 const HEADERS = COLUMNS.map(c => c.header);
 const MAX_EVENT_HEADCOUNT = 40;
@@ -119,6 +128,7 @@ function doPost(e) {
         'Additional Contribution ($)': contribution,
         'Total Due ($)': total,
         'Zelle Account Name': zelleName,
+        'Payment Confirmed': false,
       };
       const rowValues = HEADERS.map(h => (h in record ? safeCell(record[h]) : ''));
 
@@ -131,10 +141,11 @@ function doPost(e) {
         sheet.appendRow(rowValues);
       } else {
         const row = existing + 2;
-        // Keep the original submission time and any answers to retired questions
+        // Keep the original submission time, the committee's payment columns,
+        // and any answers to retired questions
         const before = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
         COLUMNS.forEach((c, i) => {
-          if (c.retired || c.header === 'Submitted At') rowValues[i] = before[i];
+          if (c.retired || c.admin || c.header === 'Submitted At') rowValues[i] = before[i];
         });
         sheet.getRange(row, 1, 1, rowValues.length).setValues([rowValues]);
         updated = true;
@@ -221,7 +232,18 @@ function getSheet() {
   migrateIds(sheet);
   sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
   sheet.setFrozenRows(1);
+  addCheckboxes(sheet);
   return sheet;
+}
+
+function addCheckboxes(sheet) {
+  const col = HEADERS.indexOf('Payment Confirmed') + 1;
+  if (sheet.getMaxRows() < 2) return;
+  const range = sheet.getRange(2, col, sheet.getMaxRows() - 1, 1);
+  const rule = range.getDataValidation();
+  if (!rule || rule.getCriteriaType() !== SpreadsheetApp.DataValidationCriteria.CHECKBOX) {
+    range.insertCheckboxes();
+  }
 }
 
 /**
@@ -257,6 +279,8 @@ function migrateLayout(sheet) {
   const rows = data.slice(1).map(r => source.map(i => (i === -1 ? '' : r[i])).concat(extras.map(i => r[i])));
 
   sheet.clearContents();
+  // Checkboxes belong to a column name, not a position; getSheet() re-adds them.
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).clearDataValidations();
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   if (rows.length) sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
   console.log('Rearranged ' + rows.length + ' rows to the new column order. Backup: "' + SHEET_NAME + ' backup ' + stamp + '"');
@@ -290,10 +314,123 @@ function migrateIds(sheet) {
   if (changed) sheet.getRange(2, 1, n, 1).setValues(ids);
 }
 
-/** Run from the editor to create the sheet (or reorder its columns) and grant permissions. */
+/**
+ * Run from the editor to create the sheet (or reorder its columns), add the
+ * Payment Confirmed checkboxes, install the checkbox trigger, and grant
+ * permissions. Safe to run again.
+ */
 function setup() {
   getSheet();
+
+  // Sending email needs an "installable" edit trigger; a plain onEdit() can't.
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'onPaymentEdit')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger('onPaymentEdit').forSpreadsheet(ss).onEdit().create();
+
   console.log('Ready. Remaining email quota today: ' + MailApp.getRemainingDailyQuota());
+}
+
+/**
+ * Runs whenever someone edits the sheet. When "Payment Confirmed" is ticked
+ * on a row that hasn't been emailed yet, sends the "Registration Confirmed"
+ * email and records when it went out. Untick + clear the timestamp to resend.
+ */
+function onPaymentEdit(e) {
+  const range = e && e.range;
+  if (!range || range.getSheet().getName() !== SHEET_NAME) return;
+
+  const col = HEADERS.indexOf('Payment Confirmed') + 1;
+  if (col < range.getColumn() || col > range.getLastColumn()) return;
+
+  const sheet = range.getSheet();
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    for (let row = Math.max(2, range.getRow()); row <= range.getLastRow(); row++) {
+      const values = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
+      const r = {};
+      HEADERS.forEach((h, i) => { r[h] = values[i]; });
+      if (r['Payment Confirmed'] !== true || r['Confirmation Email Sent At']) continue;
+
+      const box = sheet.getRange(row, col);
+      if (!String(r['Zelle Confirmation #']).trim()) {
+        box.setValue(false).setNote('Enter the Zelle Confirmation # for this row first, then tick again.');
+        continue;
+      }
+      try {
+        sendPaymentConfirmed(r);
+        box.setNote(null);
+        sheet.getRange(row, HEADERS.indexOf('Confirmation Email Sent At') + 1).setValue(new Date());
+      } catch (err) {
+        console.error('Payment confirmation email failed for row ' + row + ': ' + err);
+        box.setValue(false).setNote('Email could not be sent (' + err.message + '). Tick again to retry.');
+      }
+    }
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function sendPaymentConfirmed(r) {
+  const money = v => '$' + Number(v || 0).toLocaleString();
+  const people = n => `${Number(n) || 0} ${Number(n) === 1 ? 'person' : 'people'}`;
+  const received = r['Amount Received ($)'] !== '' ? r['Amount Received ($)'] : r['Total Due ($)'];
+  const contribution = Number(r['Additional Contribution ($)']) || 0;
+
+  const counts = [
+    ['VIQI Alumni ($150 each)', r['Category 1: VIQI Alumni ($150)']],
+    ['VIQI Alumni Students / Guests over 10 ($75 each)', r['Category 2: VIQI Alumni Students / Guests over 10 ($75)']],
+    ['Children ages 2–10 ($50 each)', r['Category 3: Children ages 2–10 ($50)']],
+    ['Children under 2 (free)', r['Category 4: Children under 2 (Free)']],
+  ].filter(([, n]) => Number(n) > 0)
+   .map(([label, n]) => `<tr><td>${esc(label)}</td><td align="right">${Number(n)}</td></tr>`)
+   .join('');
+
+  const row = (label, value) => `<tr><td>${label}</td><td align="right">${value}</td></tr>`;
+  const table = inner => `<table cellpadding="6" style="border-collapse:collapse;width:100%;border:1px solid #e3e3de;margin:0 0 16px">${inner}</table>`;
+  const heading = t => `<h3 style="margin:18px 0 6px">${t}</h3>`;
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;font-size:14px;color:#1a1a18;max-width:560px">
+      <h2 style="margin:0 0 8px">${esc(EVENT_NAME)}</h2>
+      <p>Dear ${esc(r['Full Name'])},</p>
+      <p style="background:#dcfce7;border-left:4px solid #166534;padding:10px 14px"><strong>Great news! We have received your Zelle payment, and your registration is now CONFIRMED.</strong> Thank you!</p>
+      ${heading('Registration details')}
+      ${table(
+        row('Registration ID', esc(r['Registration ID'])) +
+        row('Name', esc(r['Full Name'])) +
+        row('SSC / HSC Batch', `${esc(r['SSC Batch'])} / ${esc(r['HSC Batch'])}`)
+      )}
+      ${heading('Your gatherings')}
+      ${table(
+        row('January 30, 2027 — Meet, Greet &amp; Reminisce', people(r['Meet & Greet Headcount (Jan 30)'])) +
+        row('January 31, 2027 — Gala Lunch', people(r['Gala Lunch Headcount (Jan 31)']))
+      )}
+      ${heading('Participation')}
+      ${table(counts + (contribution > 0 ? row('Additional contribution', money(contribution)) : ''))}
+      ${heading('Payment received')}
+      ${table(
+        row('Amount received', `<strong>${esc(money(received))}</strong>`) +
+        row('Zelle confirmation #', esc(r['Zelle Confirmation #']))
+      )}
+      ${contribution > 0 ? '<p>Thank you so much for your generous additional contribution. It will go a long way toward making this 75-year celebration a successful and memorable event for everyone.</p>' : ''}
+      <p>Please keep this email and your Zelle confirmation number as your registration record.</p>
+      ${heading('What’s next')}
+      <p>We will share the venue, timings and other event details closer to the date. If any of your plans change, or if anything above looks incorrect, simply reply to this email and let us know.</p>
+      <p>We are so looking forward to reconnecting, reminiscing, and celebrating 75 years of VNSC together with you and your family!</p>
+      <p>Warmly,<br>VIQI 75 Years’ Celebration in AZ Planning Committee</p>
+    </div>`;
+
+  MailApp.sendEmail({
+    to: String(r['Email']),
+    cc: ORGANIZER_EMAIL,
+    replyTo: ORGANIZER_EMAIL,
+    name: EVENT_NAME,
+    subject: `Registration Confirmed: ${EVENT_NAME} (${r['Registration ID']})`,
+    htmlBody: html,
+  });
 }
 
 function clean(v) {

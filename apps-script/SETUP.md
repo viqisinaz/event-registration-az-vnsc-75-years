@@ -27,6 +27,25 @@ For every submission the backend:
 8. In `index.html`, replace `PASTE_APPS_SCRIPT_WEB_APP_URL_HERE` with that URL,
    then commit and push.
 
+## Confirming payments
+
+After you check a registrant's Zelle payment, go to their row in the
+**Registrations** tab and fill in:
+
+1. **Zelle Confirmation #**: the number from the Zelle payment (required).
+2. **Amount Received ($)**: optional. If left blank, the email shows their Total Due.
+3. Tick **Payment Confirmed**.
+
+Ticking the box emails a "Registration Confirmed" message to the registrant,
+with viqis.in.az@gmail.com on CC, and fills in **Confirmation Email Sent At**.
+
+- If the Zelle Confirmation # is empty, the box unticks itself and leaves a
+  note on the cell explaining why.
+- Each row is emailed only once. To send it again, clear **Confirmation Email
+  Sent At**, untick the box and tick it again.
+- The checkbox only works after `setup` has been run once with this version
+  of the script, because `setup` installs the trigger that sends the email.
+
 ## Getting the spreadsheet as Excel
 
 In the Google Sheet, use **File → Download → Microsoft Excel (.xlsx)**. Don't
