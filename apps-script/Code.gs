@@ -132,13 +132,18 @@ function doPost(e) {
       };
       const rowValues = HEADERS.map(h => (h in record ? safeCell(record[h]) : ''));
 
-      const ids = sheet.getLastRow() > 1
-        ? sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().map(r => String(r[0]))
+      const lastRow = lastRegistrationRow(sheet);
+      const ids = lastRow > 1
+        ? sheet.getRange(2, 1, lastRow - 1, 1).getValues().map(r => String(r[0]))
         : [];
       const existing = ids.indexOf(id);
 
       if (existing === -1) {
-        sheet.appendRow(rowValues);
+        // Write right under the last registration. (appendRow() skips past
+        // empty rows that have checkbox formatting, landing at row 1000+.)
+        const row = lastRow + 1;
+        sheet.getRange(row, 1, 1, rowValues.length).setValues([rowValues]);
+        sheet.getRange(row, HEADERS.indexOf('Payment Confirmed') + 1).setDataValidation(checkboxRule());
       } else {
         const row = existing + 2;
         // Keep the original submission time, the committee's payment columns,
@@ -229,6 +234,7 @@ function getSheet() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   migrateLayout(sheet);
+  tidyRows(sheet);
   migrateIds(sheet);
   sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
   sheet.setFrozenRows(1);
@@ -236,14 +242,54 @@ function getSheet() {
   return sheet;
 }
 
+/** Row number of the last registration (by Registration ID), or 1 if none. */
+function lastRegistrationRow(sheet) {
+  const last = sheet.getLastRow();
+  if (last < 2) return 1;
+  const ids = sheet.getRange(2, 1, last - 1, 1).getValues();
+  for (let i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0]).trim() !== '') return i + 2;
+  }
+  return 1;
+}
+
+function checkboxRule() {
+  return SpreadsheetApp.newDataValidation().requireCheckbox().build();
+}
+
+// Checkboxes go only on rows that hold a registration. Formatting empty rows
+// (or using insertCheckboxes(), which writes FALSE into every cell) makes
+// Google treat them as used, which pushed new registrations to row 1000+.
 function addCheckboxes(sheet) {
   const col = HEADERS.indexOf('Payment Confirmed') + 1;
-  if (sheet.getMaxRows() < 2) return;
-  const range = sheet.getRange(2, col, sheet.getMaxRows() - 1, 1);
-  const rule = range.getDataValidation();
-  if (!rule || rule.getCriteriaType() !== SpreadsheetApp.DataValidationCriteria.CHECKBOX) {
-    range.insertCheckboxes();
+  const lastRow = lastRegistrationRow(sheet);
+  if (sheet.getMaxRows() > lastRow) {
+    sheet.getRange(lastRow + 1, col, sheet.getMaxRows() - lastRow, 1).clearDataValidations();
   }
+  if (lastRow >= 2) sheet.getRange(2, col, lastRow - 1, 1).setDataValidation(checkboxRule());
+}
+
+/**
+ * Clears rows that hold only leftovers (a blank ID like "vnsc_az_75", an
+ * unticked FALSE checkbox, or nothing) and moves the real registrations up so
+ * they sit together under the header. Saves a backup tab first. Does nothing
+ * once the sheet is tidy.
+ */
+function tidyRows(sheet) {
+  const last = sheet.getLastRow();
+  if (last < 2) return;
+  const width = sheet.getLastColumn();
+  const data = sheet.getRange(2, 1, last - 1, width).getValues();
+  const isJunk = r => r.every(v => v === '' || v === false || String(v).trim() === 'vnsc_az_75');
+  const keep = data.filter(r => !isJunk(r));
+  if (keep.length === data.length) return;
+
+  const stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+  sheet.copyTo(sheet.getParent()).setName(SHEET_NAME + ' backup ' + stamp);
+
+  sheet.getRange(2, 1, last - 1, width).clearContent().clearDataValidations();
+  if (keep.length) sheet.getRange(2, 1, keep.length, width).setValues(keep);
+  console.log('Removed ' + (data.length - keep.length) + ' empty rows; ' + keep.length + ' registrations kept. Backup: "' + SHEET_NAME + ' backup ' + stamp + '"');
 }
 
 /**
@@ -307,6 +353,7 @@ function migrateIds(sheet) {
   const at = h => HEADERS.indexOf(h);
   let changed = false;
   const ids = data.map(r => {
+    if (!String(r[at('Full Name')]).trim()) return [r[0]]; // not a registration
     const id = makeId(r[at('Full Name')], r[at('SSC Batch')], r[at('HSC Batch')], r[at('Phone Number')]);
     if (id !== String(r[0])) changed = true;
     return [id];
@@ -344,32 +391,76 @@ function onPaymentEdit(e) {
   const col = HEADERS.indexOf('Payment Confirmed') + 1;
   if (col < range.getColumn() || col > range.getLastColumn()) return;
 
-  const sheet = range.getSheet();
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
     for (let row = Math.max(2, range.getRow()); row <= range.getLastRow(); row++) {
-      const values = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
-      const r = {};
-      HEADERS.forEach((h, i) => { r[h] = values[i]; });
-      if (r['Payment Confirmed'] !== true || r['Confirmation Email Sent At']) continue;
-
-      const box = sheet.getRange(row, col);
-      if (!String(r['Zelle Confirmation #']).trim()) {
-        box.setValue(false).setNote('Enter the Zelle Confirmation # for this row first, then tick again.');
-        continue;
-      }
-      try {
-        sendPaymentConfirmed(r);
-        box.setNote(null);
-        sheet.getRange(row, HEADERS.indexOf('Confirmation Email Sent At') + 1).setValue(new Date());
-      } catch (err) {
-        console.error('Payment confirmation email failed for row ' + row + ': ' + err);
-        box.setValue(false).setNote('Email could not be sent (' + err.message + '). Tick again to retry.');
-      }
+      confirmRow(range.getSheet(), row);
     }
   } finally {
     lock.releaseLock();
+  }
+}
+
+/** Adds a "VNSC 75" menu to the sheet each time it is opened. */
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('VNSC 75')
+    .addItem('Send confirmation emails for ticked rows', 'sendPendingConfirmations')
+    .addToUi();
+}
+
+/**
+ * Menu item (or run from the editor): sends the "Registration Confirmed"
+ * email for every ticked row that hasn't been emailed yet, then shows what
+ * happened. A backup to the checkbox trigger.
+ */
+function sendPendingConfirmations() {
+  const sheet = getSheet();
+  const results = [];
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    for (let row = 2; row <= lastRegistrationRow(sheet); row++) {
+      const result = confirmRow(sheet, row);
+      if (result) results.push('Row ' + row + ': ' + result);
+    }
+  } finally {
+    lock.releaseLock();
+  }
+  const summary = results.length ? results.join('\n') : 'No ticked rows are waiting for an email.';
+  console.log(summary);
+  try { SpreadsheetApp.getUi().alert(summary); } catch (e) { /* run from the editor: see the log */ }
+}
+
+/**
+ * Sends the confirmed email for one row if Payment Confirmed is ticked and it
+ * hasn't been sent yet. Returns a short description, or '' if nothing to do.
+ */
+function confirmRow(sheet, row) {
+  const col = HEADERS.indexOf('Payment Confirmed') + 1;
+  const values = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
+  const r = {};
+  HEADERS.forEach((h, i) => { r[h] = values[i]; });
+
+  const ticked = r['Payment Confirmed'] === true || String(r['Payment Confirmed']).toUpperCase() === 'TRUE';
+  if (!ticked || r['Confirmation Email Sent At']) return '';
+
+  const who = r['Full Name'] + ' <' + r['Email'] + '>';
+  const box = sheet.getRange(row, col);
+  if (!String(r['Zelle Confirmation #']).trim()) {
+    box.setValue(false).setNote('Enter the Zelle Confirmation # for this row first, then tick again.');
+    return 'skipped ' + who + ': no Zelle Confirmation # yet (box unticked).';
+  }
+  try {
+    sendPaymentConfirmed(r);
+    box.setNote(null);
+    sheet.getRange(row, HEADERS.indexOf('Confirmation Email Sent At') + 1).setValue(new Date());
+    return 'sent to ' + who + '.';
+  } catch (err) {
+    console.error('Payment confirmation email failed for row ' + row + ': ' + err);
+    box.setValue(false).setNote('Email could not be sent (' + err.message + '). Tick again to retry.');
+    return 'FAILED for ' + who + ': ' + err.message;
   }
 }
 
