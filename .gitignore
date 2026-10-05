@@ -5,3 +5,6 @@
 
 # macOS folder metadata
 .DS_Store
+
+# Local-only email templates for the planning committee
+email-templates/
