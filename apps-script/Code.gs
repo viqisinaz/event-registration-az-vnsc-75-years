@@ -22,9 +22,9 @@ const SHEET_NAME = 'Registrations';
 // Keep in sync with the prices shown in index.html. Totals are recalculated
 // here so an edited page can't change what gets recorded.
 const CATEGORIES = [
-  { field: 'Viqi Alumni Count',   label: 'VIQI Alumni',                               price: 150 },
-  { field: 'Student/Guest Count', label: 'VIQI Alumni Students / Guests over age 10', price: 75 },
-  { field: 'Child Count',         label: 'Children ages 2–10',                        price: 50 },
+  { field: 'Viqi Alumni Count',   label: 'VIQI Alumni',                                                  price: 150 },
+  { field: 'Student/Guest Count', label: 'Guests over age 10',                                           price: 75 },
+  { field: 'Child Count',         label: 'VIQI Alumni Students or Student Spouses/Children ages 2–10', price: 50 },
 ];
 const MAX_PER_CATEGORY = 10;
 const MAX_CONTRIBUTION = 100000;
@@ -45,8 +45,8 @@ const COLUMNS = [
   { header: 'Meet & Greet Headcount (Jan 30)' },
   { header: 'Gala Lunch Headcount (Jan 31)' },
   { header: 'Category 1: VIQI Alumni ($150)',                          was: ['Viqi Alumni'] },
-  { header: 'Category 2: VIQI Alumni Students / Guests over 10 ($75)', was: ['Student / Guest (above 10 yrs)'] },
-  { header: 'Category 3: Children ages 2–10 ($50)',                    was: ['Child (above 2 yrs, under 10 yrs)'] },
+  { header: 'Category 2: Guests over 10 ($75)', was: ['Category 2: VIQI Alumni Students / Guests over 10 ($75)', 'Student / Guest (above 10 yrs)'] },
+  { header: 'Category 3: VIQI Alumni Students or Student Spouses/Children 2–10 ($50)', was: ['Category 3: Children ages 2–10 ($50)', 'Child (above 2 yrs, under 10 yrs)'] },
   { header: 'Category 4: Children under 2 (Free)',                     was: ['Children under 2 (free)'] },
   { header: 'Additional Contribution ($)' },
   { header: 'Total Due ($)' },
@@ -122,8 +122,8 @@ function doPost(e) {
         'Meet & Greet Headcount (Jan 30)': meet,
         'Gala Lunch Headcount (Jan 31)': gala,
         'Category 1: VIQI Alumni ($150)': counts[0],
-        'Category 2: VIQI Alumni Students / Guests over 10 ($75)': counts[1],
-        'Category 3: Children ages 2–10 ($50)': counts[2],
+        'Category 2: Guests over 10 ($75)': counts[1],
+        'Category 3: VIQI Alumni Students or Student Spouses/Children 2–10 ($50)': counts[2],
         'Category 4: Children under 2 (Free)': infants,
         'Additional Contribution ($)': contribution,
         'Total Due ($)': total,
@@ -215,6 +215,7 @@ function sendConfirmation(r) {
       </div>
       <p><strong>Your Zelle payment is the official confirmation of your registration and attendance.</strong> Please save your Zelle confirmation number, as it will serve as your registration record.</p>
       <p><strong>We will send you a confirmation email once we have received and confirmed your Zelle payment.</strong> Until then, your registration remains in progress.</p>
+      <p>Please wait while we process your registration. <strong>It may take up to one week to receive your registration confirmed email.</strong></p>
       <p>If anything above is wrong, simply submit the form again with the same full name, SSC batch, HSC batch and phone number and it will replace this registration, or reply to this email.</p>
       <p>Warmly,<br>VIQI 75 Years’ Celebration in AZ Planning Committee</p>
     </div>`;
@@ -472,8 +473,8 @@ function sendPaymentConfirmed(r) {
 
   const counts = [
     ['VIQI Alumni ($150 each)', r['Category 1: VIQI Alumni ($150)']],
-    ['VIQI Alumni Students / Guests over 10 ($75 each)', r['Category 2: VIQI Alumni Students / Guests over 10 ($75)']],
-    ['Children ages 2–10 ($50 each)', r['Category 3: Children ages 2–10 ($50)']],
+    ['Guests over 10 ($75 each)', r['Category 2: Guests over 10 ($75)']],
+    ['VIQI Alumni Students or Student Spouses/Children 2–10 ($50 each)', r['Category 3: VIQI Alumni Students or Student Spouses/Children 2–10 ($50)']],
     ['Children under 2 (free)', r['Category 4: Children under 2 (Free)']],
   ].filter(([, n]) => Number(n) > 0)
    .map(([label, n]) => `<tr><td>${esc(label)}</td><td align="right">${Number(n)}</td></tr>`)

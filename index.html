@@ -931,8 +931,8 @@
       <p class="block-sub">Minimum participation fees for the 2-day event</p>
       <div class="fee-grid">
         <div class="fee"><span class="fee-amt">$150</span><span class="fee-who">VIQI Alumna / Alumnus</span></div>
-        <div class="fee"><span class="fee-amt">$75</span><span class="fee-who">VIQI Alumni Student / Guest over age 10</span></div>
-        <div class="fee"><span class="fee-amt">$50</span><span class="fee-who">Children ages 2–10</span></div>
+        <div class="fee"><span class="fee-amt">$75</span><span class="fee-who">Guest over age 10</span></div>
+        <div class="fee"><span class="fee-amt">$50</span><span class="fee-who">VIQI Alumni Student or Student Spouse/Children ages 2–10</span></div>
         <div class="fee fee-free"><span class="fee-amt">Free</span><span class="fee-who">Children under age 2</span></div>
       </div>
       <p>These fees represent the minimum contribution needed to help us cover the costs of organizing and hosting the reunion.</p>
@@ -1032,7 +1032,7 @@
               <div class="cat-info">
                 <span class="cat-kicker">January 30, 2027</span>
                 <span class="cat-title">How many people from your household will join the Meet, Greet &amp; Reminisce event?</span>
-                <span class="cat-sub">Please include yourself.</span>
+                <span class="cat-sub">Please include everyone, including yourself and any kids under age 2.</span>
               </div>
               <div class="stepper">
                 <button type="button" class="step-btn" onclick="step('meet',-1)" aria-label="Fewer: How many people from your household will join the Meet, Greet &amp; Reminisce event?">−</button>
@@ -1044,7 +1044,7 @@
               <div class="cat-info">
                 <span class="cat-kicker">January 31, 2027</span>
                 <span class="cat-title">How many people from your household will join the Gala Lunch?</span>
-                <span class="cat-sub">Please include yourself.</span>
+                <span class="cat-sub">Please include everyone, including yourself and any kids under age 2.</span>
               </div>
               <div class="stepper">
                 <button type="button" class="step-btn" onclick="step('gala',-1)" aria-label="Fewer: How many people from your household will join the Gala Lunch?">−</button>
@@ -1075,13 +1075,13 @@
             <div class="cat-row" id="cat2row">
               <div class="cat-info">
                 <span class="cat-kicker">Category 2</span>
-                <span class="cat-title">Number of VIQI Alumni Students / Guests over age 10 attending</span>
+                <span class="cat-title">Number of guests over age 10 attending</span>
               </div>
               <span class="cat-price-tag">$75<small style="font-size:10px;font-weight:500;opacity:.65"> each</small></span>
               <div class="stepper">
-                <button type="button" class="step-btn" onclick="step('cat2',-1)" aria-label="Fewer: Number of VIQI Alumni Students / Guests over age 10 attending">−</button>
+                <button type="button" class="step-btn" onclick="step('cat2',-1)" aria-label="Fewer: Number of guests over age 10 attending">−</button>
                 <div class="step-val" id="cat2val">0</div>
-                <button type="button" class="step-btn" onclick="step('cat2',1)" aria-label="More: Number of VIQI Alumni Students / Guests over age 10 attending">+</button>
+                <button type="button" class="step-btn" onclick="step('cat2',1)" aria-label="More: Number of guests over age 10 attending">+</button>
               </div>
             </div>
 
@@ -1089,13 +1089,13 @@
             <div class="cat-row" id="cat3row">
               <div class="cat-info">
                 <span class="cat-kicker">Category 3</span>
-                <span class="cat-title">Number of children ages 2–10 attending</span>
+                <span class="cat-title">Number of VIQI Alumni Students or Student Spouses/Children ages 2–10 attending</span>
               </div>
               <span class="cat-price-tag">$50<small style="font-size:10px;font-weight:500;opacity:.65"> each</small></span>
               <div class="stepper">
-                <button type="button" class="step-btn" onclick="step('cat3',-1)" aria-label="Fewer: Number of children ages 2–10 attending">−</button>
+                <button type="button" class="step-btn" onclick="step('cat3',-1)" aria-label="Fewer: Number of VIQI Alumni Students or Student Spouses/Children ages 2–10 attending">−</button>
                 <div class="step-val" id="cat3val">0</div>
-                <button type="button" class="step-btn" onclick="step('cat3',1)" aria-label="More: Number of children ages 2–10 attending">+</button>
+                <button type="button" class="step-btn" onclick="step('cat3',1)" aria-label="More: Number of VIQI Alumni Students or Student Spouses/Children ages 2–10 attending">+</button>
               </div>
             </div>
 
@@ -1169,12 +1169,12 @@
           <span class="br-sub zero" id="b1sub">$0</span>
         </div>
         <div class="br-row">
-          <span class="br-name">Students/Guests</span>
+          <span class="br-name">Guests over 10</span>
           <span class="br-calc" id="b2calc">0 × $75</span>
           <span class="br-sub zero" id="b2sub">$0</span>
         </div>
         <div class="br-row">
-          <span class="br-name">Children</span>
+          <span class="br-name">Students/Spouses/Children 2–10</span>
           <span class="br-calc" id="b3calc">0 × $50</span>
           <span class="br-sub zero" id="b3sub">$0</span>
         </div>
@@ -1200,7 +1200,7 @@
         <div class="err-banner" id="errBanner">
           Something went wrong. Please try again or contact viqis.in.az@gmail.com
         </div>
-        <p class="pending-note"><strong>Submitting this form starts your registration.</strong> It is confirmed only after we receive and verify your Zelle payment. Please save your Zelle confirmation number. We’ll email you a confirmation once your payment is confirmed.</p>
+        <p class="pending-note"><strong>Submitting this form starts your registration.</strong> It is confirmed only after we receive and verify your Zelle payment. Please save your Zelle confirmation number. We’ll email you a confirmation once your payment is confirmed. Please wait while we process your registration. It may take up to one week to receive your registration confirmed email.</p>
         <p class="form-note">A “registration in progress” email will be sent to you and to viqis.in.az@gmail.com.</p>
       </div>
     </div>
@@ -1223,6 +1223,7 @@
         <p>Zelle Recipient: <b>Sabira Enayet</b> · Phone: <a href="tel:+14805439295">(480) 543-9295</a></p>
         <p class="memo-line">📝 <strong>In the Zelle message field, please write:</strong> <span id="memoText"></span></p>
         <p>Your Zelle payment is the official confirmation of your registration and attendance. <strong>Please save your Zelle confirmation number.</strong> We’ll send you a confirmation email once we have received and confirmed your Zelle payment.</p>
+        <p>⏳ <strong>Please wait while we process your registration.</strong> It may take up to one week to receive your registration confirmed email.</p>
       </div>
       <div class="receipt" id="receipt"></div>
     </div>
@@ -1348,8 +1349,8 @@
         <div class="rc-row"><span>Zelle Account Name</span><span>${zName}</span></div>`;
 
       if (counts.cat1) rows += `<div class="rc-row"><span>VIQI Alumni (${counts.cat1})</span><span>${fmt(counts.cat1*150)}</span></div>`;
-      if (counts.cat2) rows += `<div class="rc-row"><span>Students/Guests (${counts.cat2})</span><span>${fmt(counts.cat2*75)}</span></div>`;
-      if (counts.cat3) rows += `<div class="rc-row"><span>Children (${counts.cat3})</span><span>${fmt(counts.cat3*50)}</span></div>`;
+      if (counts.cat2) rows += `<div class="rc-row"><span>Guests over 10 (${counts.cat2})</span><span>${fmt(counts.cat2*75)}</span></div>`;
+      if (counts.cat3) rows += `<div class="rc-row"><span>Students/Spouses/Children 2–10 (${counts.cat3})</span><span>${fmt(counts.cat3*50)}</span></div>`;
       if (counts.cat4) rows += `<div class="rc-row"><span>Children under 2 (${counts.cat4})</span><span>Free</span></div>`;
       if (extra) rows += `<div class="rc-row"><span>Additional contribution</span><span>${fmt(extra)}</span></div>`;
       rows += `<div class="rc-row rc-total"><span>Total Due</span><span>${fmt(grand)}</span></div>`;
