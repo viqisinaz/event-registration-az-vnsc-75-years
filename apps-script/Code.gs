@@ -14,8 +14,11 @@
  */
 
 const ORGANIZER_EMAIL = 'viqis.in.az@gmail.com';
-const ZELLE_RECIPIENT = 'Sabira Enayet';
-const ZELLE_PHONE = '(480) 543-9295';
+// Registrants may pay either recipient. Keep in sync with index.html.
+const ZELLE_RECIPIENTS = [
+  { name: 'Sabira Enayet',   phone: '(480) 543-9295' },
+  { name: 'Sameena Hossain', phone: '(480) 289-8283' },
+];
 const EVENT_NAME = 'VIQI 75 Years’ Celebration in AZ';
 const SHEET_NAME = 'Registrations';
 
@@ -206,8 +209,8 @@ function sendConfirmation(r) {
         <tr style="border-top:2px solid #e3e3de"><td><strong>Total Due</strong></td><td align="right"><strong>$${r.total.toLocaleString()}</strong></td></tr>
       </table>
       <h3 style="margin:20px 0 6px">Next step: complete your Zelle payment</h3>
-      <p>Please send your Total Due of <strong>$${r.total.toLocaleString()}</strong> via Zelle to:</p>
-      <p style="margin-left:14px">Zelle Recipient: <strong>${esc(ZELLE_RECIPIENT)}</strong><br>Zelle Phone Number: <strong>${esc(ZELLE_PHONE)}</strong></p>
+      <p>Please send your Total Due of <strong>$${r.total.toLocaleString()}</strong> via Zelle to <strong>either</strong> of these recipients:</p>
+      ${ZELLE_RECIPIENTS.map(z => `<p style="margin-left:14px">Zelle Recipient: <strong>${esc(z.name)}</strong><br>Zelle Phone Number: <strong>${esc(z.phone)}</strong></p>`).join('')}
       <div style="background:#e8eefb;border:2px solid #1d4fa8;border-radius:8px;padding:12px 16px;margin:12px 0">
         <p style="margin:0 0 6px;color:#1d4fa8;font-weight:bold">📝 Important: add a message in Zelle</p>
         <p style="margin:0 0 8px">Please make sure to add your <strong>name, SSC batch and HSC batch</strong> in the optional message field while sending the money through Zelle. This will help identify and confirm your registration. Thank you!</p>
