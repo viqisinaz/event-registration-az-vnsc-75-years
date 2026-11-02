@@ -66,6 +66,24 @@ const COLUMNS = [
 const HEADERS = COLUMNS.map(c => c.header);
 const MAX_EVENT_HEADCOUNT = 40;
 
+// Registration closes once either event's total headcount reaches this.
+const EVENT_CAPACITY = 150;
+const MEET_HEADER = 'Meet & Greet Headcount (Jan 30)';
+const GALA_HEADER = 'Gala Lunch Headcount (Jan 31)';
+const FULL_MESSAGE = 'We’re sorry, registration is now closed because the event has reached full capacity.';
+
+// The form asks this on load so it can show the "Registration Closed" page.
+function doGet() {
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+    const totals = sheet ? eventTotals(sheet) : { meet: 0, gala: 0 };
+    return reply({ ok: true, open: !isFull(totals) });
+  } catch (err) {
+    console.error(err);
+    return reply({ ok: false });
+  }
+}
+
 function doPost(e) {
   try {
     const p = (e && e.parameter) || {};
@@ -140,6 +158,18 @@ function doPost(e) {
         ? sheet.getRange(2, 1, lastRow - 1, 1).getValues().map(r => String(r[0]))
         : [];
       const existing = ids.indexOf(id);
+
+      // Once an event is full, only existing registrants may resubmit, and
+      // only without adding people to either event.
+      const totals = eventTotals(sheet);
+      if (isFull(totals)) {
+        if (existing === -1) return reply({ ok: false, closed: true, error: FULL_MESSAGE });
+        const before = sheet.getRange(existing + 2, 1, 1, HEADERS.length).getValues()[0];
+        const was = h => Number(before[HEADERS.indexOf(h)]) || 0;
+        if (meet > was(MEET_HEADER) || gala > was(GALA_HEADER)) {
+          return reply({ ok: false, error: 'Registration is now full, so we can’t add more people to your registration. Please email ' + ORGANIZER_EMAIL + ' if your plans have changed.' });
+        }
+      }
 
       if (existing === -1) {
         // Write right under the last registration. (appendRow() skips past
@@ -341,6 +371,26 @@ function migrateLayout(sheet) {
  * "vnsc_az_75_jane-doe_2010_2012_4805550123". Case, extra spaces, punctuation
  * and phone formatting don't matter, so small typing differences still match.
  */
+// Total headcount per event across every registration in the sheet.
+function eventTotals(sheet) {
+  const totals = { meet: 0, gala: 0 };
+  const lastRow = lastRegistrationRow(sheet);
+  if (lastRow < 2) return totals;
+  const lastCol = sheet.getLastColumn();
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(h => String(h).trim());
+  const meetCol = headers.indexOf(MEET_HEADER);
+  const galaCol = headers.indexOf(GALA_HEADER);
+  sheet.getRange(2, 1, lastRow - 1, lastCol).getValues().forEach(r => {
+    if (meetCol !== -1) totals.meet += Number(r[meetCol]) || 0;
+    if (galaCol !== -1) totals.gala += Number(r[galaCol]) || 0;
+  });
+  return totals;
+}
+
+function isFull(totals) {
+  return totals.meet >= EVENT_CAPACITY || totals.gala >= EVENT_CAPACITY;
+}
+
 function makeId(name, ssc, hsc, phone) {
   const slug = v => String(v).trim().toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
   // Digits only; "+1 480…" and "480…" are the same US number

@@ -1234,6 +1234,20 @@
     </div>
   </div>
 
+  <!-- Closed: shown once either event reaches capacity (checked with the Apps Script on load) -->
+  <div id="closedScreen" hidden>
+    <div class="success-wrap">
+      <div class="s-icon pending">🎉</div>
+      <h2>Registration Is Closed</h2>
+      <p>Thank you for the wonderful response! The 75 Years Celebration of VNSC in Arizona has reached full capacity, so we are no longer accepting new registrations.</p>
+      <div class="next-step">
+        <strong>Already registered?</strong>
+        <p>Your registration is still in place. If you haven’t sent your Zelle payment yet, please send it to either <b>Sabira Enayet</b> · <a href="tel:+14805439295">(480) 543-9295</a> or <b>Sameena Hossain</b> · <a href="tel:+14802898283">(480) 289-8283</a>, with your name, SSC batch and HSC batch in the Zelle message.</p>
+        <p>Questions? Email <a href="mailto:viqis.in.az@gmail.com">viqis.in.az@gmail.com</a>.</p>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -1242,6 +1256,26 @@
   const rates  = { cat1: 150, cat2: 75, cat3: 50 };
   const MAX = 10;
   const EVENT_MAX = 40; // household headcount per event
+
+  // ── Registration closed ──────────────────────────────────────────
+  function showClosed() {
+    ['formLayout', 'pageHeader', 'contactNote', 'successScreen'].forEach(id => {
+      document.getElementById(id).hidden = true;
+    });
+    document.getElementById('closedScreen').hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  // ?closed previews the page. If the check fails the form stays open;
+  // the Apps Script still refuses new registrations once an event is full.
+  if (new URLSearchParams(location.search).has('closed')) {
+    showClosed();
+  } else {
+    fetch(document.getElementById('regForm').action)
+      .then(res => res.json())
+      .then(data => { if (data.ok && data.open === false) showClosed(); })
+      .catch(() => {});
+  }
 
   function step(id, delta) {
     const max = (id === 'meet' || id === 'gala') ? EVENT_MAX : MAX;
@@ -1330,6 +1364,7 @@
       });
       const data = await res.json();
 
+      if (data.closed) { showClosed(); return; }
       if (!data.ok) throw { userMessage: data.error };
 
       // Build receipt
