@@ -202,7 +202,6 @@
 
   /* Events */
   .events { display: grid; gap: 20px; }
-  @media (min-width: 640px) { .events { grid-template-columns: 1fr 1fr; } }
 
   .event { display: flex; gap: 18px; align-items: flex-start; }
 
@@ -253,7 +252,116 @@
     line-height: 1.25;
   }
 
-  .event p:last-child { color: var(--fg-muted); font-size: 14px; }
+  .event-body { flex: 1; min-width: 0; }
+  .event-lead { color: var(--fg-muted); font-size: 14px; }
+  .event-body > p:not(.event-kicker):not(.event-lead) { font-size: 14.5px; }
+
+  .event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    margin: 2px 0 12px;
+  }
+  .event-meta span {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 3px 11px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .event.gala .event-meta span { background: var(--gold-bg); color: var(--gold); }
+
+  .event-sub {
+    font-family: var(--font-d);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 6px !important;
+  }
+  .event.gala .event-sub { color: var(--gold); }
+
+  .dress {
+    background: var(--surface-alt);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+  .dress p { margin: 0 0 6px; }
+  .dress p:last-child { margin: 0; }
+  .dress-tip { color: var(--fg-muted); font-size: 13px; }
+
+  .swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 8px; }
+  .sw {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .sw-gap { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+  .sw-no { position: relative; opacity: .75; }
+  .sw-no::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    top: 50%;
+    height: 2px;
+    background: var(--error);
+    transform: rotate(-45deg);
+  }
+  .sw-pair { display: inline-flex; align-items: center; gap: 6px; }
+  .sw-note { font-size: 12px; color: var(--fg-muted); }
+
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li {
+    display: grid;
+    grid-template-columns: 118px 1fr;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px dashed var(--border);
+    font-size: 14px;
+  }
+  .timeline li:first-child { border-top: 0; }
+  .tl-time { font-family: var(--font-d); font-weight: 700; color: var(--gold); white-space: nowrap; }
+  .tl-note { color: var(--fg-muted); font-size: 12.5px; margin: 8px 0 0 !important; }
+
+  @media (max-width: 480px) {
+    .event { flex-direction: column; gap: 12px; }
+    .timeline li { grid-template-columns: 1fr; gap: 0; }
+  }
+
+  /* Good to know */
+  .info-note {
+    background: var(--accent-bg);
+    color: var(--fg);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .info-note strong { color: var(--accent); }
+
+  .know-list { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 16px; }
+  .know-list li { display: flex; gap: 14px; align-items: flex-start; }
+  .know-ico {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+  }
+  .know-list strong { font-family: var(--font-d); font-size: 15px; display: block; margin: 6px 0 2px; }
+  .know-list p { color: var(--fg-muted); font-size: 14px; margin: 0 0 6px !important; }
+  .know-list p:last-child { margin: 0 !important; }
 
   /* Fees */
   .fee-grid {
@@ -373,7 +481,7 @@
     place-items: center;
   }
 
-  .steps strong { font-family: var(--font-d); font-size: 15px; display: block; margin: 4px 0 2px; }
+  .steps li > div > strong { font-family: var(--font-d); font-size: 15px; display: block; margin: 4px 0 2px; }
   .steps li p { color: var(--fg-muted); font-size: 14px; }
 
   .zelle-card {
@@ -909,18 +1017,53 @@
     <div class="events">
       <article class="card event">
         <div class="event-date"><span class="ed-mon">Jan</span><span class="ed-day">30</span><span class="ed-yr">2027</span></div>
-        <div>
+        <div class="event-body">
           <p class="event-kicker">Day 1</p>
           <h2>Meet, Greet &amp; Reminisce</h2>
-          <p>A gathering to reconnect, catch up, share memories, fun &amp; laughter, take lots of photos, and enjoy time together.</p>
+          <div class="event-meta"><span>📍 Papago Park</span><span>🕙 10:00 AM – 4:00 PM</span></div>
+          <p class="event-lead">A gathering to reconnect, catch up, share memories, fun &amp; laughter, take lots of photos, and enjoy time together.</p>
+          <p>We’ll have a relaxed outdoor day with a picnic, ice-breaking activities, <em>adda</em> and reminiscing, lots of pictures, informal games, and a short hike for anyone who is interested.</p>
+          <div class="dress">
+            <p class="event-sub">Dress code</p>
+            <p>A <strong>white top</strong> of any kind with jeans or any other bottom of your choice.</p>
+            <p class="dress-tip">👟 Since we’ll be outdoors and may do some walking, please wear comfortable shoes or bring a comfortable pair with you.</p>
+          </div>
         </div>
       </article>
       <article class="card event gala">
         <div class="event-date"><span class="ed-mon">Jan</span><span class="ed-day">31</span><span class="ed-yr">2027</span></div>
-        <div>
+        <div class="event-body">
           <p class="event-kicker">Day 2</p>
-          <h2>Gala Lunch</h2>
-          <p>A celebratory gathering with food and cultural programs where we will create new memories while reliving the old ones.</p>
+          <h2>VIQI 75 Years’ Gala Luncheon &amp; Celebration</h2>
+          <div class="event-meta"><span>📍 Avion Center</span><span>🕛 Please arrive by 12:00 PM</span></div>
+          <p class="event-lead">A celebratory gathering with food and cultural programs where we will create new memories while reliving the old ones.</p>
+          <p>We’ll have a check-in and welcome area, welcome packages, VIQI-themed photo booths and memory corners, group photos, games, lunch, cultural programs, and a band performance.</p>
+          <div class="dress">
+            <p class="event-sub">Dress code</p>
+            <p><strong>Saree in shades of white and blue.</strong> Any shade from white, off-white, ivory, and light blue through brighter shades of blue will work beautifully. We would just like to exclude <strong>navy blue</strong> from the color palette.</p>
+            <div class="swatches" role="img" aria-label="Color palette: white, off-white, ivory, light blue through bright blue. No navy blue.">
+              <span class="sw" style="background:#ffffff"></span>
+              <span class="sw" style="background:#f8f5ee"></span>
+              <span class="sw" style="background:#fffbea"></span>
+              <span class="sw" style="background:#d6e6f8"></span>
+              <span class="sw" style="background:#9cc3ef"></span>
+              <span class="sw" style="background:#5b9be3"></span>
+              <span class="sw" style="background:#2563d4"></span>
+              <span class="sw-gap"></span>
+              <span class="sw-pair"><span class="sw sw-no" style="background:#1c2b4d"></span><span class="sw-note">No navy</span></span>
+            </div>
+          </div>
+          <div class="dress">
+            <p class="event-sub">Tentative schedule</p>
+            <ol class="timeline">
+              <li><span class="tl-time">12:00 PM</span><span>Check-in, welcome package, and gathering</span></li>
+              <li><span class="tl-time">12:30 PM</span><span>Appetizers and tea</span></li>
+              <li><span class="tl-time">1:00 PM</span><span>Group photo and cake cutting</span></li>
+              <li><span class="tl-time">1:00–2:15 PM</span><span>Meet &amp; greet, games, photo booths, memory corners, and more photos</span></li>
+              <li><span class="tl-time">2:15 PM</span><span>Lunch and dessert</span></li>
+              <li><span class="tl-time">3:30 PM onward</span><span>Cultural program and band performance</span></li>
+            </ol>
+          </div>
         </div>
       </article>
     </div>
@@ -935,6 +1078,7 @@
         <div class="fee"><span class="fee-amt">$50</span><span class="fee-who">VIQI Alumni Student or Student Spouse/Children ages 2–10</span></div>
         <div class="fee fee-free"><span class="fee-amt">Free</span><span class="fee-who">Children under age 2</span></div>
       </div>
+      <div class="info-note"><strong>One fee covers BOTH days.</strong> There is no separate fee for each day. However, we do need an accurate headcount for each day for food, seating, activities, and other arrangements, so please clearly indicate your household’s headcount for each day in the registration form.</div>
       <p>These fees represent the minimum contribution needed to help us cover the costs of organizing and hosting the reunion.</p>
       <div class="give-note">💛 We would also be very grateful to those who are able and would like to contribute more than the minimum participation fee. Any additional contribution will help us make this 75-year celebration a successful and memorable event for everyone.</div>
     </section>
@@ -980,6 +1124,36 @@
         </li>
       </ol>
       <div class="confirm-note">✓ Submitting this form <strong>starts</strong> your registration. It will be considered confirmed once we have received both your completed registration information and your Zelle payment. We will send you a confirmation email once your Zelle payment is received and confirmed.</div>
+    </section>
+
+    <!-- Good to know -->
+    <section class="card">
+      <h2 class="block-title">Good to Know</h2>
+      <p class="block-sub">Spots, priority, and refunds</p>
+      <ul class="know-list">
+        <li>
+          <span class="know-ico" aria-hidden="true">👥</span>
+          <div>
+            <strong>Limited to 150 participants</strong>
+            <p>We can accommodate a maximum of 150 participants, and registration will close once we reach that number.</p>
+          </div>
+        </li>
+        <li>
+          <span class="know-ico" aria-hidden="true">🇺🇸</span>
+          <div>
+            <strong>Now open to VIQIs across the United States</strong>
+            <p>The Arizona priority period ended on October 30, and registration is now open to VIQIs outside Arizona and across the United States. Because space is limited, spots are available on a first-come, first-served basis until we reach capacity.</p>
+          </div>
+        </li>
+        <li>
+          <span class="know-ico" aria-hidden="true">↩️</span>
+          <div>
+            <strong>Refunds through November 30, 2026</strong>
+            <p>Refund requests can be accommodated through November 30, 2026. After November 30, we will not be able to issue refunds because of our venue commitments and cancellation policy.</p>
+            <p>If you are unable to attend after that date, you may arrange to transfer your registration to someone else. Please let the planning team know so we can update our records.</p>
+          </div>
+        </li>
+      </ul>
     </section>
 
     <!-- Sign-off -->
